@@ -2,7 +2,7 @@
 # part of the operatingsystems module @FH-Münster
 # Author: Daniel Knüppe (@DanielKnueppe)
 
-TARGETS = osmpstarter osmprun testsuite
+TARGETS = osmpclient osmprun testsuite
 LIBRARY = libosmp
 LIB_DIR = osmplib
 BUILD_DIR = build
@@ -16,9 +16,13 @@ OBJS = 	$(foreach S, $(notdir $(SRCS)), $(BUILD_DIR)/$(basename $(S)).o)
 OBJS += $(LIB_OBJS)
 
 CC = gcc
-CC_FLAGS = -Wall -Wextra -Wpedantic -Werror -std=c99
+CC_FLAGS = -Wall -Wextra -Wpedantic -std=c99
 LD_FLAGS = -lpthread
 DEFINES =
+
+ifdef RELEASE
+CC_FLAGS += -Werror
+endif
 
 RUN_TESTSUITE =$(BUILD_DIR)/testsuite
 
