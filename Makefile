@@ -37,7 +37,6 @@ $(BUILD_DIR)/%.o : */src/%.c
 
 $(BUILD_DIR)/lib$(LIBRARY).a : $(LIB_OBJS)
 	ar rcs $@ $^ 
-	#$(wildcard $(BUILD_DIR)/osmplib/*.o)
 
 ###############################################################################
 # This template in conjunction with the following foreach loop serves
@@ -46,7 +45,7 @@ $(BUILD_DIR)/lib$(LIBRARY).a : $(LIB_OBJS)
 # also for some reason automatic variables don't work inside said template
 ###############################################################################
 define TARGET_template
-$1 : $2
+$1 : $2 $(BUILD_DIR)/lib$(LIBRARY).a
 	$(CC) -o $1 $2 -L$(BUILD_DIR) -l$(LIBRARY) \
 	$(CC_FLAGS) $(LD_FLAGS) $(DEFINES) \
 	$(foreach D, $(INC_DIRS), -I$D)
