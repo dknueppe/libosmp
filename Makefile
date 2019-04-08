@@ -3,7 +3,7 @@
 # Author: Daniel Knüppe (@DanielKnueppe)
 
 TARGETS = osmpclient osmprun testsuite
-LIBRARY = libosmp
+LIBRARY = osmp
 LIB_DIR = osmplib
 BUILD_DIR = build
 
@@ -26,29 +26,30 @@ endif
 
 RUN_TESTSUITE =$(BUILD_DIR)/testsuite
 
-all : $(BUILD_DIR) $(BUILD_DIR)/$(LIBRARY).a $(OBJS) $(foreach T, $(TARGETS), $(BUILD_DIR)/$T)
+all : $(BUILD_DIR) $(BUILD_DIR)/lib$(LIBRARY).a $(OBJS) $(foreach T, $(TARGETS), $(BUILD_DIR)/$T)
 
 $(BUILD_DIR) :
 	mkdir $@
 
 $(BUILD_DIR)/%.o : */src/%.c
 	$(CC) -o $@ -c $^ $(CC_FLAGS) $(LD_FLAGS) $(DEFINES) \
-		$(foreach D, $(INC_DIRS), -I$D) 
+	$(foreach D, $(INC_DIRS), -I$D) 
 
-$(BUILD_DIR)/$(LIBRARY).a : $(LIB_OBJS)
-	ar rcs $@ $(wildcard $(BUILD_DIR)/osmplib/*.o)
+$(BUILD_DIR)/lib$(LIBRARY).a : $(LIB_OBJS)
+	ar rcs $@ $^ 
+	#$(wildcard $(BUILD_DIR)/osmplib/*.o)
 
 ###############################################################################
-# This template in conjunction with the following foreach loop serve
+# This template in conjunction with the following foreach loop serves
 # the purpose of creating make targets, that have different parameters
 # but where every parameter can be determined through rules.
 # also for some reason automatic variables don't work inside said template
 ###############################################################################
 define TARGET_template
 $1 : $2
-	$(CC) -o $1 $2 $(BUILD_DIR)/$(LIBRARY).a \
+	$(CC) -o $1 $2 -L$(BUILD_DIR) -l$(LIBRARY) \
 	$(CC_FLAGS) $(LD_FLAGS) $(DEFINES) \
-	$(foreach D, $(INC_DIRS), -I$D) 
+	$(foreach D, $(INC_DIRS), -I$D)
 endef
 
 $(foreach T, $(TARGETS), $(eval $(call TARGET_template, $(BUILD_DIR)/$T, \
