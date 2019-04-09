@@ -73,7 +73,7 @@ int OSMP_Finalize(void)
     if(munmap(shm, shm_meta.shm_size) == -1)
         return OSMP_ERROR;
     printf("the unlinking goes wrong\n");
-    if(shm_unlink("OSMP-SHM-00000000") == -1)
+    if(shm_unlink(shm_meta.shm_name) == -1)
         return OSMP_ERROR;
 
     return OSMP_SUCCESS;
