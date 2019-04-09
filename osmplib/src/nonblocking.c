@@ -1,4 +1,4 @@
 #include <stdio.h>
 #include "osmplib.h"
 
-/* Implement library functions here */
+/* Implement asynchrounus library functions here */

@@ -13,6 +13,21 @@
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
 
+typedef void* OSMP_Request;
+
+/* max amount of messages per process */
+#define OSMP_MAX_MESSAGES_PROC 16
+/* max amount of messages per session */
+#define OSMP_MAX_SLOTS 256
+/* max length of actual message */
+#define OSMP_MAX_PAYLOAD_LENGTH 1024
+
+struct shm_info{
+    int shm_fd;
+    char shm_name[18];
+    unsigned int shm_size;
+} shm_meta;
+
 // just to shut up the compiler, change to actual message type later
 typedef void* OSMP_Datatype;
 
