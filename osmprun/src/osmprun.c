@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // create truncate and map the shared memory into the library manager
     void * shm;
     get_shm_name18(shm_meta.shm_name);
     shm_meta.shm_size = (sizeof(char) * OSMP_MAX_SLOTS);
@@ -64,18 +65,25 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    // allocate and initialize dummy message
     char *messages = malloc(shm_meta.shm_size);
+    if(messages == NULL)
+        exit(1);
     int A = 0;
     for(unsigned int i = 0; i < sizeof(int); i++)
         A += ('A' << (8*i));
     memset(messages, A, shm_meta.shm_size);
-    *(struct shm_info*)messages = shm_meta;
+    memcpy(messages, &shm_meta, sizeof(shm_meta));
     messages[shm_meta.shm_size - 1] = '\0';
+
+    // initialize shared memory from dummy message
     memcpy(shm, messages, shm_meta.shm_size);
+
     free(messages);
 
     printf("\n%s\n", (char*)shm + sizeof(struct shm_info));
 
+    // launch num_proc child processes 
     pid_t pid_list[num_proc];
     int ret_exec;
     argv[0] = shm_meta.shm_name;
@@ -90,6 +98,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // wait for child processes
     for(int i = 0; i < num_proc; i++) {
         int status;
         pid_t tmp = wait(&status);

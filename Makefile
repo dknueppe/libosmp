@@ -16,7 +16,7 @@ OBJS = 	$(foreach S, $(notdir $(SRCS)), $(BUILD_DIR)/$(basename $(S)).o)
 OBJS += $(LIB_OBJS)
 
 CC = gcc
-CC_FLAGS = -g -O2 -Wall -Wextra -Wpedantic -std=c99
+CC_FLAGS = -g -O2 -Wall -Wextra -Wpedantic -std=gnu99
 LD_FLAGS = -lpthread -lrt
 DEFINES =
 

@@ -1,9 +1,16 @@
-#include <stdio.h>
-#include "osmplib.h"
-
-/* This program manages the launch of executables that want to utilize 
- * the osmp library 
+/**
+ * @file client.c
+ * 
+ * @brief The source for the program which gets multithreaded
+ * 
+ * @author Daniel Knüppe, Roderick Topütt 
+ * 
+ * @date April 2019
  */
+
+#include <stdio.h>
+#include <unistd.h>
+#include "osmplib.h"
 
 void *shm;
 
@@ -13,7 +20,7 @@ int main(int argc, char *argv[])
     if(!(status = OSMP_Init(&argc, &argv) == OSMP_SUCCESS))
         printf("Error\n");
     printf("shared memory message :\n%s\n", (char*)shm + sizeof(struct shm_info));
-    sleep(5);
+    sleep(2);
     if(!(status = OSMP_Finalize() == OSMP_SUCCESS))
         printf("Error\n");
 
