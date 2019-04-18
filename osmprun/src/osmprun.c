@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     int opt;
     int num_proc = NUM_PROC;
     char *program = PROG;
+    int shm_fd;
     
     while ((opt = getopt(argc, argv, "np")) != -1) {
         switch (opt){
@@ -47,37 +48,39 @@ int main(int argc, char *argv[])
     }
 
     // create truncate and map the shared memory into the library manager
-    void * shm;
-    get_shm_name18(shm_meta.shm_name);
-    shm_meta.shm_size = (sizeof(char) * OSMP_MAX_SLOTS);
-    shm_meta.shm_fd = shm_open(shm_meta.shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
-    if(shm_meta.shm_fd == -1) {
+    void *shm;
+    char shm_name[18];
+    size_t shm_size;
+    get_shm_name18(shm_name);
+    shm_size = (sizeof(char) * OSMP_MAX_SLOTS);
+    shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+    if(shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
         exit(1);
     }
-    if(ftruncate(shm_meta.shm_fd, shm_meta.shm_size) == -1) {
+    if(ftruncate(shm_fd, shm_size) == -1) {
         printf("Error calling ftruncate:\n%s",strerror(errno));
         exit(1);
     }
-    shm = mmap(NULL, shm_meta.shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_meta.shm_fd, 0);
+    shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     if(shm == MAP_FAILED) {
         printf("Error calling mmap:\n%s",strerror(errno));
         exit(1);
     }
 
     // allocate and initialize dummy message
-    char *messages = malloc(shm_meta.shm_size);
+    char *messages = malloc(shm_size);
     if(messages == NULL)
         exit(1);
     int A = 0;
     for(unsigned int i = 0; i < sizeof(int); i++)
         A += ('A' << (8*i));
-    memset(messages, A, shm_meta.shm_size);
-    memcpy(messages, &shm_meta, sizeof(shm_meta));
-    messages[shm_meta.shm_size - 1] = '\0';
+    memset(messages, A, shm_size);
+    *(size_t *)messages = shm_size;
+    messages[shm_size - 1] = '\0';
 
     // initialize shared memory from dummy message
-    memcpy(shm, messages, shm_meta.shm_size);
+    memcpy(shm, messages, shm_size);
 
     free(messages);
 
@@ -86,7 +89,7 @@ int main(int argc, char *argv[])
     // launch num_proc child processes 
     pid_t pid_list[num_proc];
     int ret_exec;
-    argv[0] = shm_meta.shm_name;
+    argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
         pid_list[i] = fork();
         if(pid_list[i] == -1) {
@@ -105,11 +108,11 @@ int main(int argc, char *argv[])
         printf("child with pid [%d] exited\n", tmp);
     }
 
-    if(munmap(shm, shm_meta.shm_size) == -1) {
+    if(munmap(shm, shm_size) == -1) {
         printf("Error calling munmap:\n%s",strerror(errno));
         exit(1);
     }
-    if(shm_unlink(shm_meta.shm_name) == -1) {
+    if(shm_unlink(shm_name) == -1) {
         printf("Error calling shm_unlink:\n%s",strerror(errno));
         exit(1);
     }

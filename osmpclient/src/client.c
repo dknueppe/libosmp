@@ -12,14 +12,12 @@
 #include <unistd.h>
 #include "osmplib.h"
 
-void *shm;
-
 int main(int argc, char *argv[])
 {
     int status;
     if(!(status = OSMP_Init(&argc, &argv) == OSMP_SUCCESS))
         printf("Error\n");
-    printf("shared memory message :\n%s\n", (char*)shm + sizeof(struct shm_info));
+    printf("shared memory message :\n%s\n", (char*)g_shm + sizeof(struct shm_info));
     sleep(2);
     if(!(status = OSMP_Finalize() == OSMP_SUCCESS))
         printf("Error\n");
