@@ -13,11 +13,6 @@
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
 
-void *g_shm;
-int g_shm_fd;
-
-typedef void* OSMP_Request;
-
 /* max amount of messages per process */
 #define OSMP_MAX_MESSAGES_PROC 16
 /* max amount of messages per session */
@@ -25,14 +20,39 @@ typedef void* OSMP_Request;
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
-struct shm_info{
-    int shm_fd;
-    char shm_name[18];
-    size_t shm_size;
-} shm_meta;
+void *g_shm;
+int g_shm_fd;
 
-// just to shut up the compiler, change to actual message type later
-typedef void* OSMP_Datatype;
+typedef void* OSMP_Request;
+
+typedef enum{
+    OSMP_SHORT,
+    OSMP_INT,
+    OSMP_LONG,
+    OSMP_UNSIGNED_CHAR,
+    OSMP_UNSIGNED_SHORT,
+    OSMP_UNSIGNED,
+    OSMP_UNSIGNED_LONG,
+    OSMP_FLOAT,
+    OSMP_DOUBLE,
+    OSMP_BYTE,
+} OSMP_Datatype;
+
+typedef struct {
+    unsigned int next;
+    unsigned int sender;
+    unsigned int receiver;
+    unsigned int len;
+    char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
+    OSMP_Datatype datatype;
+} msg_node;
+
+typedef struct {
+    size_t shm_size;
+    unsigned int num_proc;
+    unsigned int pid_list;
+    msg_node messages[OSMP_MAX_SLOTS];
+} base;
 
 /**
  * @brief initializes the OSMP environment

@@ -30,7 +30,7 @@ int OSMP_Init(int *argc, char ***argv)
     if(g_shm == MAP_FAILED)
         return OSMP_ERROR;
     size_t shm_size = *(size_t *)g_shm;
-    munmap(g_shm,sizeof(struct shm_info));
+    munmap(g_shm,sizeof(size_t));
 
     g_shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
     if(g_shm == MAP_FAILED)
