@@ -17,14 +17,13 @@ int main(int argc, char *argv[])
     int status;
     if(!(status = OSMP_Init(&argc, &argv) == OSMP_SUCCESS))
         printf("Error\n");
-    printf("shared memory message :\n%s\n", (char*)g_shm + sizeof(struct shm_info));
     sleep(2);
     if(!(status = OSMP_Finalize() == OSMP_SUCCESS))
         printf("Error\n");
 
     int foo = 0;
     char bar[] = "hello world!";
-    OSMP_Datatype foobar = NULL;
+    OSMP_Datatype foobar = OSMP_BYTE;
     if(!(status = OSMP_Size(&foo) == OSMP_SUCCESS))
         printf("Error\n");
     if(!(status = OSMP_Rank(&foo) == OSMP_SUCCESS))

@@ -84,8 +84,6 @@ int main(int argc, char *argv[])
 
     free(messages);
 
-    printf("\n%s\n", (char*)shm + sizeof(struct shm_info));
-
     // launch num_proc child processes 
     pid_t pid_list[num_proc];
     int ret_exec;
