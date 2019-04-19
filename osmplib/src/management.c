@@ -20,8 +20,6 @@
 
 int OSMP_Init(int *argc, char ***argv)
 {
-    printf("OSMP_Init was called!\n");
-
     g_shm_fd = shm_open(*argv[0], O_RDWR, 0644);
     if(g_shm_fd == -1)
         return OSMP_ERROR;
@@ -41,11 +39,42 @@ int OSMP_Init(int *argc, char ***argv)
 
 int OSMP_Finalize(void)
 {
-    printf("OSMP_Finalize was called!\n");
+    if(g_shm == NULL)
+        return OSMP_ERROR;
 
-    extern void *g_shm;
     if(munmap(g_shm, *(size_t *)g_shm) == -1)
         return OSMP_ERROR;
 
+    return OSMP_SUCCESS;
+}
+
+int OSMP_Rank(int *rank)
+{
+    if(g_shm == NULL)
+        return OSMP_ERROR;
+
+    int size;
+    int ret = OSMP_Size(&size);
+    if(ret == OSMP_ERROR)
+        return OSMP_ERROR;
+    pid_t pid = getpid();
+
+    while(size){
+        if(pid == ((pid_t *)g_shm + ((OSMP_base *)g_shm)->pid_list)[size]){
+            *rank = size;
+            return OSMP_SUCCESS;
+        }
+        --size;
+    }
+
+    return OSMP_SUCCESS;
+}
+
+int OSMP_Size(int *size)
+{
+    if(g_shm == NULL)
+        return OSMP_ERROR;
+
+    *size = ((OSMP_base *)g_shm)->num_proc;
     return OSMP_SUCCESS;
 }

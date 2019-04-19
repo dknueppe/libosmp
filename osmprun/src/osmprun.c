@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
 
 void get_shm_name18(char c[])
 {
-    srand(++osmp_shm_name_seed + time(NULL));
+    srand(getpid() + time(NULL));
     c[0] = 'O';
     c[1] = 'S';
     c[2] = 'M';
