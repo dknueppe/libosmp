@@ -27,23 +27,24 @@
 #define NUM_PROC 3
 #define PROG "build/osmpclient"
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
-    int opt;
     int num_proc = NUM_PROC;
     char *program = PROG;
     int shm_fd;
     
-    while ((opt = getopt(argc, argv, "np")) != -1) {
-        switch (opt){
-        case 'n' :
+    int opt;
+    while((opt = getopt(argc, argv, "n:p:")) != -1) {
+        switch(opt) {
+        case 'n':
             num_proc = atoi(optarg);
             break;
-        case 'p' :
+        case 'p':
             program = optarg;
             break;
-        default :
-            printf("Unknown arguments are ignored!\n");
+        default:
+            printf("Unrecognized option!\n");
+            exit(EXIT_FAILURE);
         }
     }
 
