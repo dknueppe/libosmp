@@ -18,6 +18,9 @@
 #include <fcntl.h>
 #include "osmplib.h"
 
+void *g_shm = NULL;
+int g_shm_fd = 0;
+
 int OSMP_Init(int *argc, char ***argv)
 {
     g_shm_fd = shm_open(*argv[0], O_RDWR, 0644);

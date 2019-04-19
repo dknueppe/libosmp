@@ -20,8 +20,8 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
-void *g_shm = NULL;
-int g_shm_fd = 0;
+extern void *g_shm = NULL;
+extern int g_shm_fd = 0;
 
 typedef void* OSMP_Request;
 
@@ -45,14 +45,19 @@ typedef struct {
     unsigned int len;
     char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
     OSMP_Datatype datatype;
-} msg_node;
+} OMSP_msg_node;
 
 typedef struct {
     size_t shm_size;
     unsigned int num_proc;
     unsigned int pid_list;
-    msg_node messages[OSMP_MAX_SLOTS];
+    OMSP_msg_node messages[OSMP_MAX_SLOTS];
 } OSMP_base;
+
+typedef struct {
+    unsigned int front;
+    unsigned int back;
+} OSMP_queue;
 
 /**
  * @brief initializes the OSMP environment

@@ -53,7 +53,9 @@ int main (int argc, char *argv[])
     char shm_name[18];
     size_t shm_size;
     get_shm_name18(shm_name);
-    shm_size = (sizeof(char) * OSMP_MAX_SLOTS);
+    shm_size = (sizeof(OSMP_base) + 
+               (num_proc + 1) * sizeof(OSMP_queue) +
+               (num_proc * sizeof(pid_t)));
     shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
     if(shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
@@ -69,27 +71,22 @@ int main (int argc, char *argv[])
         exit(1);
     }
 
-    // allocate and initialize dummy message
-    char *messages = malloc(shm_size);
-    if(messages == NULL)
-        exit(1);
-    int A = 0;
-    for(unsigned int i = 0; i < sizeof(int); i++)
-        A += ('A' << (8*i));
-    memset(messages, A, shm_size);
-    *(size_t *)messages = shm_size;
-    messages[shm_size - 1] = '\0';
+    /* initialize the shared memory to its default values */
+    memset(shm, 0, shm_size);
+    OSMP_base *base = (OSMP_base *)shm;
+    base->shm_size = shm_size;
+    base->num_proc = num_proc;
+    base->pid_list = sizeof(OSMP_base);
+    pid_t *pid_list = base->pid_list + (pid_t*)shm;
 
-    // initialize shared memory from dummy message
-    memcpy(shm, messages, shm_size);
-
-    free(messages);
-
+    printf("shm address: 0x%08X, shm end: 0x%08X, pid_list address 0x%08X\n",
+            (unsigned int)shm, (unsigned int)(shm + shm_size), (unsigned int)pid_list); 
+    printf("shm_size: 0x%08lx, sizeof(OSMP_base): 0x%08lx\n", shm_size, sizeof(OSMP_base));
     // launch num_proc child processes 
-    pid_t pid_list[num_proc];
     int ret_exec;
     argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
+        printf("Fork happening next!\n"); fflush(NULL);
         pid_list[i] = fork();
         if(pid_list[i] == -1) {
             exit(1);
