@@ -16,6 +16,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <assert.h>
 #include "osmplib.h"
 
 void *g_shm = NULL;
@@ -80,4 +81,21 @@ int OSMP_Size(int *size)
 
     *size = ((OSMP_base *)g_shm)->num_proc;
     return OSMP_SUCCESS;
+}
+
+int push(OMSP_msg_node *node, OSMP_queue *queue)
+{
+    /* will assert if queue is corrupted */
+    assert(((OSMP_base *)g_shm)->messages[queue->back].next == 0);
+    node->next = 0;
+    unsigned int temp = node - ((OSMP_base *)g_shm)->messages;
+    ((OSMP_base *)g_shm)->messages[queue->back].next = temp;
+    queue->back = temp;
+}
+
+OMSP_msg_node *pop(OSMP_queue *queue)
+{
+    unsigned int temp = queue->front;
+    queue->front = ((OSMP_base *)g_shm)->messages[queue->front].next;
+    return &((OSMP_base *)g_shm)->messages[temp];
 }

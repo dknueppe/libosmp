@@ -128,4 +128,19 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
  */
 int OSMP_Finalize(void);
 
-// Asynchrounus routines will be added soon.
+/**
+ * @brief Operates on OSMP_queue, appends node to queue
+ * 
+ * param node object to be appended
+ * param queue queue to append to
+ * return int Returns 0 on success, ERROR code otherwise
+ */
+void push(OMSP_msg_node *node, OSMP_queue *queue);
+
+/**
+ * @brief Operates on OSMP_queue, pulls node from queue
+ * 
+ * param queue queue to pop from
+ * return OSMP_msg_node pointer to popped object
+ */
+OMSP_msg_node *pop(OSMP_queue *queue)
