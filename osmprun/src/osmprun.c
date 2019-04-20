@@ -48,14 +48,12 @@ int main (int argc, char *argv[])
         }
     }
 
-    // create truncate and map the shared memory into the library manager
+    /* create truncate and map the shared memory into the library manager */
     void *shm;
     char shm_name[18];
     size_t shm_size;
     get_shm_name18(shm_name);
-    shm_size = (sizeof(OSMP_base) + 
-               (num_proc + 1) * sizeof(OSMP_queue) +
-               (num_proc * sizeof(pid_t)));
+    shm_size = (sizeof(OSMP_base) + (num_proc + 1) * sizeof(OSMP_queue) + (num_proc * sizeof(pid_t)));
     shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
     if(shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
@@ -77,11 +75,8 @@ int main (int argc, char *argv[])
     base->shm_size = shm_size;
     base->num_proc = num_proc;
     base->pid_list = sizeof(OSMP_base);
-    pid_t *pid_list = base->pid_list + (pid_t*)shm;
+    pid_t *pid_list = (pid_t *)((char *)shm + base->pid_list);
 
-    printf("shm address: 0x%08X, shm end: 0x%08X, pid_list address 0x%08X\n",
-            (unsigned int)shm, (unsigned int)(shm + shm_size), (unsigned int)pid_list); 
-    printf("shm_size: 0x%08lx, sizeof(OSMP_base): 0x%08lx\n", shm_size, sizeof(OSMP_base));
     // launch num_proc child processes 
     int ret_exec;
     argv[0] = shm_name;

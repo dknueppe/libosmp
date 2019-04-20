@@ -20,8 +20,8 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
-extern void *g_shm = NULL;
-extern int g_shm_fd = 0;
+extern void *g_shm; 
+extern int g_shm_fd;
 
 typedef void* OSMP_Request;
 
