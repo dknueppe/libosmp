@@ -83,7 +83,7 @@ int OSMP_Size(int *size)
     return OSMP_SUCCESS;
 }
 
-int push(OMSP_msg_node *node, OSMP_queue *queue)
+void push(OMSP_msg_node *node, OSMP_queue *queue)
 {
     /* will assert if queue is corrupted */
     assert(((OSMP_base *)g_shm)->messages[queue->back].next == 0);

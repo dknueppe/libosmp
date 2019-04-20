@@ -31,7 +31,6 @@ int main (int argc, char *argv[])
 {
     int num_proc = NUM_PROC;
     char *program = PROG;
-    int shm_fd;
     
     int opt;
     while((opt = getopt(argc, argv, "n:p:")) != -1) {
@@ -49,33 +48,36 @@ int main (int argc, char *argv[])
     }
 
     /* create truncate and map the shared memory into the library manager */
-    void *shm;
     char shm_name[18];
     size_t shm_size;
     get_shm_name18(shm_name);
     shm_size = (sizeof(OSMP_base) + (num_proc + 1) * sizeof(OSMP_queue) + (num_proc * sizeof(pid_t)));
-    shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
-    if(shm_fd == -1) {
+    g_shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+    if(g_shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
         exit(1);
     }
-    if(ftruncate(shm_fd, shm_size) == -1) {
+    if(ftruncate(g_shm_fd, shm_size) == -1) {
         printf("Error calling ftruncate:\n%s",strerror(errno));
         exit(1);
     }
-    shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-    if(shm == MAP_FAILED) {
+    g_shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
+    if(g_shm == MAP_FAILED) {
         printf("Error calling mmap:\n%s",strerror(errno));
         exit(1);
     }
 
     /* initialize the shared memory to its default values */
-    memset(shm, 0, shm_size);
-    OSMP_base *base = (OSMP_base *)shm;
+    memset(g_shm, 0, shm_size);
+    OSMP_base *base = (OSMP_base *)g_shm;
     base->shm_size = shm_size;
     base->num_proc = num_proc;
     base->pid_list = sizeof(OSMP_base);
-    pid_t *pid_list = (pid_t *)((char *)shm + base->pid_list);
+    pid_t *pid_list = (pid_t *)((char *)g_shm + base->pid_list);
+    OSMP_queue *empty_list = (OSMP_queue *)((char *)g_shm + shm_size - sizeof(OSMP_queue));
+    for(int i = 0; i <= num_proc; i++){
+        push(&((OSMP_base *)g_shm)->messages[i], empty_list);
+    }
 
     // launch num_proc child processes 
     int ret_exec;
@@ -99,7 +101,7 @@ int main (int argc, char *argv[])
         printf("child with pid [%d] exited\n", tmp);
     }
 
-    if(munmap(shm, shm_size) == -1) {
+    if(munmap(g_shm, shm_size) == -1) {
         printf("Error calling munmap:\n%s",strerror(errno));
         exit(1);
     }

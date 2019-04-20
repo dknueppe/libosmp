@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <semaphore.h>
+
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
 
@@ -57,6 +59,7 @@ typedef struct {
 typedef struct {
     unsigned int front;
     unsigned int back;
+    sem_t length;
 } OSMP_queue;
 
 /**
@@ -131,16 +134,15 @@ int OSMP_Finalize(void);
 /**
  * @brief Operates on OSMP_queue, appends node to queue
  * 
- * param node object to be appended
- * param queue queue to append to
- * return int Returns 0 on success, ERROR code otherwise
+ * @param node object to be appended
+ * @param queue queue to append to
  */
 void push(OMSP_msg_node *node, OSMP_queue *queue);
 
 /**
  * @brief Operates on OSMP_queue, pulls node from queue
  * 
- * param queue queue to pop from
- * return OSMP_msg_node pointer to popped object
+ * @param queue queue to pop from
+ * @return OSMP_msg_node pointer to popped object
  */
-OMSP_msg_node *pop(OSMP_queue *queue)
+OMSP_msg_node *pop(OSMP_queue *queue);
