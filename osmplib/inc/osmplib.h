@@ -41,10 +41,10 @@ typedef enum{
 } OSMP_Datatype;
 
 typedef struct {
-    unsigned int next;
-    unsigned int sender;
-    unsigned int receiver;
-    unsigned int len;
+    int next;
+    int sender;
+    int receiver;
+    int len;
     char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
     OSMP_Datatype datatype;
 } OMSP_msg_node;
@@ -57,8 +57,8 @@ typedef struct {
 } OSMP_base;
 
 typedef struct {
-    unsigned int front;
-    unsigned int back;
+    int front;
+    int back;
     sem_t length;
 } OSMP_queue;
 

@@ -74,7 +74,11 @@ int main (int argc, char *argv[])
     base->num_proc = num_proc;
     base->pid_list = sizeof(OSMP_base);
     pid_t *pid_list = (pid_t *)((char *)g_shm + base->pid_list);
+    OSMP_queue *msg_queue = NULL; // todo this
     OSMP_queue *empty_list = (OSMP_queue *)((char *)g_shm + shm_size - sizeof(OSMP_queue));
+    for(int i = 0; i <= num_proc; i++){
+        // init msg_queue[]
+    }
     for(int i = 0; i <= num_proc; i++){
         push(&((OSMP_base *)g_shm)->messages[i], empty_list);
     }

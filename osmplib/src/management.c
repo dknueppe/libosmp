@@ -85,17 +85,21 @@ int OSMP_Size(int *size)
 
 void push(OMSP_msg_node *node, OSMP_queue *queue)
 {
+    /* get index for messages[] in shm from node */
+    unsigned int index = node - ((OSMP_base *)g_shm)->messages;
+    /* check if queue is empty */
+    if(queue->back == queue->front == -1)
+        queue->front = queue->back = index;
     /* will assert if queue is corrupted */
-    assert(((OSMP_base *)g_shm)->messages[queue->back].next == 0);
-    node->next = 0;
-    unsigned int temp = node - ((OSMP_base *)g_shm)->messages;
-    ((OSMP_base *)g_shm)->messages[queue->back].next = temp;
-    queue->back = temp;
+    assert(((OSMP_base *)g_shm)->messages[queue->back].next == -1);
+    node->next = -1;
+    ((OSMP_base *)g_shm)->messages[queue->back].next = index;
+    queue->back = index;
 }
 
 OMSP_msg_node *pop(OSMP_queue *queue)
 {
-    unsigned int temp = queue->front;
+    unsigned int index = queue->front;
     queue->front = ((OSMP_base *)g_shm)->messages[queue->front].next;
-    return &((OSMP_base *)g_shm)->messages[temp];
+    return &((OSMP_base *)g_shm)->messages[index];
 }
