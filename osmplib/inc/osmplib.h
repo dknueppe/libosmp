@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <semaphore.h>
+
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
 
@@ -20,8 +22,8 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
-void *g_shm;
-int g_shm_fd;
+extern void *g_shm; 
+extern int g_shm_fd;
 
 typedef void* OSMP_Request;
 
@@ -39,20 +41,33 @@ typedef enum{
 } OSMP_Datatype;
 
 typedef struct {
-    unsigned int next;
-    unsigned int sender;
-    unsigned int receiver;
-    unsigned int len;
+    int next;
+    int sender;
+    int receiver;
+    int len;
     char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
     OSMP_Datatype datatype;
-} msg_node;
+} OSMP_msg_node;
+
+typedef struct {
+    int front;
+    int back;
+    sem_t max_length;
+    sem_t availabe;
+    sem_t queue_lock;
+} OSMP_queue;
 
 typedef struct {
     size_t shm_size;
     unsigned int num_proc;
-    unsigned int pid_list;
-    msg_node messages[OSMP_MAX_SLOTS];
-} base;
+    OSMP_msg_node messages[OSMP_MAX_SLOTS];
+    OSMP_queue empty_list;
+} OSMP_base;
+
+typedef struct {
+    OSMP_queue inbox;
+    pid_t pid;
+} OSMP_pcb;
 
 /**
  * @brief initializes the OSMP environment
@@ -123,4 +138,18 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
  */
 int OSMP_Finalize(void);
 
-// Asynchrounus routines will be added soon.
+/**
+ * @brief Operates on OSMP_queue, appends node to queue
+ * 
+ * @param node object to be appended
+ * @param queue queue to append to
+ */
+void push(OSMP_msg_node *node, OSMP_queue *queue);
+
+/**
+ * @brief Operates on OSMP_queue, pulls node from queue
+ * 
+ * @param queue queue to pop from
+ * @return OSMP_msg_node pointer to popped object
+ */
+OSMP_msg_node *pop(OSMP_queue *queue);

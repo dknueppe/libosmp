@@ -10,6 +10,4 @@
 
 #pragma once
 
-static unsigned int osmp_shm_name_seed = 0;
-
 void get_shm_name18(char *c);

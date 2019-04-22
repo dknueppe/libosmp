@@ -18,18 +18,6 @@
 #include <fcntl.h>
 #include "osmplib.h"
 
-int OSMP_Size(int *size)
-{
-    printf("OSMP_Size was called!\n");
-    return OSMP_SUCCESS;
-}
-
-int OSMP_Rank(int *rank)
-{
-    printf("OSMP_Rank was called!\n");
-    return OSMP_SUCCESS;
-}
-
 int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
 {
     printf("OSMP_Send was called!\n");

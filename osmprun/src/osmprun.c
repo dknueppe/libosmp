@@ -27,72 +27,70 @@
 #define NUM_PROC 3
 #define PROG "build/osmpclient"
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
-    int opt;
     int num_proc = NUM_PROC;
     char *program = PROG;
-    int shm_fd;
     
-    while ((opt = getopt(argc, argv, "np")) != -1) {
-        switch (opt){
-        case 'n' :
+    int opt;
+    while((opt = getopt(argc, argv, "n:p:")) != -1) {
+        switch(opt) {
+        case 'n':
             num_proc = atoi(optarg);
             break;
-        case 'p' :
+        case 'p':
             program = optarg;
             break;
-        default :
-            printf("Unknown arguments are ignored!\n");
+        default:
+            printf("Unrecognized option!\n");
+            exit(EXIT_FAILURE);
         }
     }
 
-    // create truncate and map the shared memory into the library manager
-    void *shm;
+    /* create truncate and map the shared memory into the library manager */
     char shm_name[18];
     size_t shm_size;
     get_shm_name18(shm_name);
-    shm_size = (sizeof(char) * OSMP_MAX_SLOTS);
-    shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
-    if(shm_fd == -1) {
+    shm_size = (sizeof(OSMP_base) + (num_proc * sizeof(OSMP_pcb)));
+    g_shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+    if(g_shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
         exit(1);
     }
-    if(ftruncate(shm_fd, shm_size) == -1) {
+    if(ftruncate(g_shm_fd, shm_size) == -1) {
         printf("Error calling ftruncate:\n%s",strerror(errno));
         exit(1);
     }
-    shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-    if(shm == MAP_FAILED) {
+    g_shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
+    if(g_shm == MAP_FAILED) {
         printf("Error calling mmap:\n%s",strerror(errno));
         exit(1);
     }
 
-    // allocate and initialize dummy message
-    char *messages = malloc(shm_size);
-    if(messages == NULL)
+    /* initialize the shared memory to its default values */
+    memset(g_shm, -1, shm_size);
+    OSMP_base *base = (OSMP_base *)g_shm;
+    base->shm_size = shm_size;
+    base->num_proc = num_proc;
+    if(sem_init(&(base->empty_list.max_length), 1, OSMP_MAX_SLOTS))
         exit(1);
-    int A = 0;
-    for(unsigned int i = 0; i < sizeof(int); i++)
-        A += ('A' << (8*i));
-    memset(messages, A, shm_size);
-    *(size_t *)messages = shm_size;
-    messages[shm_size - 1] = '\0';
-
-    // initialize shared memory from dummy message
-    memcpy(shm, messages, shm_size);
-
-    free(messages);
+    if(sem_init(&(base->empty_list.availabe), 1, 0))
+        exit(1);
+    if(sem_init(&(base->empty_list.queue_lock), 1, 1))
+        exit(1);
+    OSMP_pcb *pcb_list = (OSMP_pcb *)((char *)g_shm + sizeof(OSMP_base));
+    for(int i = 0; i < OSMP_MAX_SLOTS; i++)
+        push(&base->messages[i], &base->empty_list);
 
     // launch num_proc child processes 
-    pid_t pid_list[num_proc];
     int ret_exec;
     argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
-        pid_list[i] = fork();
-        if(pid_list[i] == -1) {
+        printf("Fork happening next!\n"); fflush(NULL);
+        pcb_list[i].pid = fork();
+        if(pcb_list[i].pid == -1) {
             exit(1);
-        } else if (pid_list[i] == 0) {
+        } else if (pcb_list[i].pid == 0) {
             ret_exec = execvp(program, argv);
             if (ret_exec == -1)
                 exit(1);
@@ -106,7 +104,7 @@ int main(int argc, char *argv[])
         printf("child with pid [%d] exited\n", tmp);
     }
 
-    if(munmap(shm, shm_size) == -1) {
+    if(munmap(g_shm, shm_size) == -1) {
         printf("Error calling munmap:\n%s",strerror(errno));
         exit(1);
     }
@@ -120,7 +118,7 @@ int main(int argc, char *argv[])
 
 void get_shm_name18(char c[])
 {
-    srand(++osmp_shm_name_seed + time(NULL));
+    srand(getpid() + time(NULL));
     c[0] = 'O';
     c[1] = 'S';
     c[2] = 'M';
