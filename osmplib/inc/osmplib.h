@@ -47,20 +47,27 @@ typedef struct {
     int len;
     char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
     OSMP_Datatype datatype;
-} OMSP_msg_node;
-
-typedef struct {
-    size_t shm_size;
-    unsigned int num_proc;
-    unsigned int pid_list;
-    OMSP_msg_node messages[OSMP_MAX_SLOTS];
-} OSMP_base;
+} OSMP_msg_node;
 
 typedef struct {
     int front;
     int back;
-    sem_t length;
+    sem_t max_length;
+    sem_t availabe;
+    sem_t queue_lock;
 } OSMP_queue;
+
+typedef struct {
+    size_t shm_size;
+    unsigned int num_proc;
+    OSMP_msg_node messages[OSMP_MAX_SLOTS];
+    OSMP_queue empty_list;
+} OSMP_base;
+
+typedef struct {
+    OSMP_queue inbox;
+    pid_t pid;
+} OSMP_pcb;
 
 /**
  * @brief initializes the OSMP environment
@@ -137,7 +144,7 @@ int OSMP_Finalize(void);
  * @param node object to be appended
  * @param queue queue to append to
  */
-void push(OMSP_msg_node *node, OSMP_queue *queue);
+void push(OSMP_msg_node *node, OSMP_queue *queue);
 
 /**
  * @brief Operates on OSMP_queue, pulls node from queue
@@ -145,4 +152,4 @@ void push(OMSP_msg_node *node, OSMP_queue *queue);
  * @param queue queue to pop from
  * @return OSMP_msg_node pointer to popped object
  */
-OMSP_msg_node *pop(OSMP_queue *queue);
+OSMP_msg_node *pop(OSMP_queue *queue);

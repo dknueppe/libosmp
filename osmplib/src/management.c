@@ -44,10 +44,12 @@ int OSMP_Init(int *argc, char ***argv)
 int OSMP_Finalize(void)
 {
     if(g_shm == NULL)
-        return OSMP_ERROR;
+        return OSMP_SUCCESS;
 
     if(munmap(g_shm, *(size_t *)g_shm) == -1)
         return OSMP_ERROR;
+    
+    g_shm = NULL;
 
     return OSMP_SUCCESS;
 }
@@ -64,14 +66,14 @@ int OSMP_Rank(int *rank)
     pid_t pid = getpid();
 
     while(size){
-        if(pid == ((pid_t *)g_shm + ((OSMP_base *)g_shm)->pid_list)[size]){
+        if(pid == ((OSMP_pcb *)((char *)g_shm + sizeof(OSMP_base)))[size].pid) {
             *rank = size;
             return OSMP_SUCCESS;
         }
         --size;
     }
 
-    return OSMP_SUCCESS;
+    return OSMP_ERROR;
 }
 
 int OSMP_Size(int *size)
@@ -83,23 +85,31 @@ int OSMP_Size(int *size)
     return OSMP_SUCCESS;
 }
 
-void push(OMSP_msg_node *node, OSMP_queue *queue)
+void push(OSMP_msg_node *node, OSMP_queue *queue)
 {
+    sem_wait(&queue->queue_lock);
+    sem_wait(&queue->max_length);
+    sem_post(&queue->availabe);
     /* get index for messages[] in shm from node */
     unsigned int index = node - ((OSMP_base *)g_shm)->messages;
     /* check if queue is empty */
-    if(queue->back == queue->front == -1)
+    if((queue->back == queue->front) && ( queue->back == -1))
         queue->front = queue->back = index;
     /* will assert if queue is corrupted */
-    assert(((OSMP_base *)g_shm)->messages[queue->back].next == -1);
+    //assert(((OSMP_base *)g_shm)->messages[queue->back].next != -1);
     node->next = -1;
     ((OSMP_base *)g_shm)->messages[queue->back].next = index;
     queue->back = index;
+    sem_post(&queue->queue_lock);
 }
 
-OMSP_msg_node *pop(OSMP_queue *queue)
+OSMP_msg_node *pop(OSMP_queue *queue)
 {
+    sem_wait(&queue->queue_lock);
+    sem_wait(&queue->availabe);
+    sem_post(&queue->max_length);
     unsigned int index = queue->front;
     queue->front = ((OSMP_base *)g_shm)->messages[queue->front].next;
+    sem_post(&queue->queue_lock);
     return &((OSMP_base *)g_shm)->messages[index];
 }

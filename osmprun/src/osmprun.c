@@ -51,7 +51,7 @@ int main (int argc, char *argv[])
     char shm_name[18];
     size_t shm_size;
     get_shm_name18(shm_name);
-    shm_size = (sizeof(OSMP_base) + (num_proc + 1) * sizeof(OSMP_queue) + (num_proc * sizeof(pid_t)));
+    shm_size = (sizeof(OSMP_base) + (num_proc * sizeof(OSMP_pcb)));
     g_shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
     if(g_shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
@@ -68,30 +68,29 @@ int main (int argc, char *argv[])
     }
 
     /* initialize the shared memory to its default values */
-    memset(g_shm, 0, shm_size);
+    memset(g_shm, -1, shm_size);
     OSMP_base *base = (OSMP_base *)g_shm;
     base->shm_size = shm_size;
     base->num_proc = num_proc;
-    base->pid_list = sizeof(OSMP_base);
-    pid_t *pid_list = (pid_t *)((char *)g_shm + base->pid_list);
-    OSMP_queue *msg_queue = NULL; // todo this
-    OSMP_queue *empty_list = (OSMP_queue *)((char *)g_shm + shm_size - sizeof(OSMP_queue));
-    for(int i = 0; i <= num_proc; i++){
-        // init msg_queue[]
-    }
-    for(int i = 0; i <= num_proc; i++){
-        push(&((OSMP_base *)g_shm)->messages[i], empty_list);
-    }
+    if(sem_init(&(base->empty_list.max_length), 1, OSMP_MAX_SLOTS))
+        exit(1);
+    if(sem_init(&(base->empty_list.availabe), 1, 0))
+        exit(1);
+    if(sem_init(&(base->empty_list.queue_lock), 1, 1))
+        exit(1);
+    OSMP_pcb *pcb_list = (OSMP_pcb *)((char *)g_shm + sizeof(OSMP_base));
+    for(int i = 0; i < OSMP_MAX_SLOTS; i++)
+        push(&base->messages[i], &base->empty_list);
 
     // launch num_proc child processes 
     int ret_exec;
     argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
         printf("Fork happening next!\n"); fflush(NULL);
-        pid_list[i] = fork();
-        if(pid_list[i] == -1) {
+        pcb_list[i].pid = fork();
+        if(pcb_list[i].pid == -1) {
             exit(1);
-        } else if (pid_list[i] == 0) {
+        } else if (pcb_list[i].pid == 0) {
             ret_exec = execvp(program, argv);
             if (ret_exec == -1)
                 exit(1);
