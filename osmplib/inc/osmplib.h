@@ -21,6 +21,12 @@
 #define OSMP_MAX_SLOTS 256
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
+/*
+ * useful defines that turn up places 
+ * also this is the actual memory layout 
+ */
+#define base ((OSMP_base*)g_shm)
+#define pcb_list ((OSMP_pcb*)((char*)g_shm+sizeof(OSMP_base)))
 
 extern void *g_shm; 
 extern int g_shm_fd;

@@ -65,12 +65,11 @@ int OSMP_Rank(int *rank)
         return OSMP_ERROR;
     pid_t pid = getpid();
 
-    while(size){
-        if(pid == ((OSMP_pcb *)((char *)g_shm + sizeof(OSMP_base)))[size].pid) {
-            *rank = size;
+    for(int i = 0; i < size; i++) {
+        if(pid == pcb_list[i].pid) {
+            *rank = i;
             return OSMP_SUCCESS;
         }
-        --size;
     }
 
     return OSMP_ERROR;

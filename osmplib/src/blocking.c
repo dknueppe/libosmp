@@ -20,7 +20,7 @@
 
 int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
 {
-    printf("OSMP_Send was called!\n");
+    
     return OSMP_SUCCESS;
 }
 
