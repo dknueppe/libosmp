@@ -17,19 +17,19 @@ int main(int argc, char *argv[])
     int status;
     if(!(status = OSMP_Init(&argc, &argv) == OSMP_SUCCESS))
         printf("Error\n");
-    sleep(2);
 
-    int foo = 0;
+    int rank = -1;
     char bar[] = "hello world!";
+    char recv[1024];
     OSMP_Datatype foobar = OSMP_BYTE;
-    if((status = OSMP_Size(&foo) != OSMP_SUCCESS))
+    if((status = OSMP_Size(&rank) != OSMP_SUCCESS))
         printf("Error 1\n");
-    if((status = OSMP_Rank(&foo) != OSMP_SUCCESS))
+    if((status = OSMP_Rank(&rank) != OSMP_SUCCESS))
         printf("Error 2\n");
-    if((status = OSMP_Send(bar,foo, foobar, foo) != OSMP_SUCCESS))
+    if((status = OSMP_Send(bar, sizeof(bar), OSMP_BYTE, rank) != OSMP_SUCCESS))
         printf("Error 3\n");
-    if((status = OSMP_Recv(bar, foo, foobar, &foo, &foo) != OSMP_SUCCESS))
-        printf("Error 4\n");
+    //if((status = OSMP_Recv(bar, rank, foobar, &rank, &rank) != OSMP_SUCCESS))
+    //    printf("Error 4\n");
 
     if(!(status = OSMP_Finalize() == OSMP_SUCCESS))
         printf("Error\n");

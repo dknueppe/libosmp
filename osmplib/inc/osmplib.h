@@ -33,8 +33,8 @@ extern int g_shm_fd;
 
 typedef void* OSMP_Request;
 
-typedef enum{
-    OSMP_SHORT,
+typedef enum {
+    OSMP_SHORT = 1,
     OSMP_INT,
     OSMP_LONG,
     OSMP_UNSIGNED_CHAR,
