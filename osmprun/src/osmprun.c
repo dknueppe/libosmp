@@ -79,6 +79,14 @@ int main (int argc, char *argv[])
         exit(1);
     for(int i = 0; i < OSMP_MAX_SLOTS; i++)
         push(&base->messages[i], &base->empty_list);
+    for(int i = 0; i < num_proc; i++) {
+        if(sem_init(&pcb_list[i].inbox.max_length, 1, OSMP_MAX_SLOTS))
+            exit(1);
+        if(sem_init(&pcb_list[i].inbox.availabe, 1, 0))
+            exit(1);
+        if(sem_init(&pcb_list[i].inbox.queue_lock, 1, 1))
+            exit(1);
+    }
 
     // launch num_proc child processes 
     int ret_exec;
