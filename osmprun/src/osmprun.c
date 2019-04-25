@@ -69,7 +69,6 @@ int main (int argc, char *argv[])
 
     /* initialize the shared memory to its default values */
     memset(g_shm, -1, shm_size);
-    OSMP_base *base = (OSMP_base *)g_shm;
     base->shm_size = shm_size;
     base->num_proc = num_proc;
     if(sem_init(&(base->empty_list.max_length), 1, OSMP_MAX_SLOTS))
@@ -78,26 +77,34 @@ int main (int argc, char *argv[])
         exit(1);
     if(sem_init(&(base->empty_list.queue_lock), 1, 1))
         exit(1);
-    OSMP_pcb *pcb_list = (OSMP_pcb *)((char *)g_shm + sizeof(OSMP_base));
     for(int i = 0; i < OSMP_MAX_SLOTS; i++)
         push(&base->messages[i], &base->empty_list);
+    for(int i = 0; i < num_proc; i++) {
+        if(sem_init(&pcb_list[i].inbox.max_length, 1, OSMP_MAX_SLOTS))
+            exit(1);
+        if(sem_init(&pcb_list[i].inbox.availabe, 1, 0))
+            exit(1);
+        if(sem_init(&pcb_list[i].inbox.queue_lock, 1, 1))
+            exit(1);
+    }
 
     // launch num_proc child processes 
     int ret_exec;
+    pid_t tmp;
     argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
-        printf("Fork happening next!\n"); fflush(NULL);
-        pcb_list[i].pid = fork();
-        if(pcb_list[i].pid == -1) {
+        tmp = fork();
+        if(tmp == -1) {
             exit(1);
-        } else if (pcb_list[i].pid == 0) {
+        } else if (tmp == 0) {
             ret_exec = execvp(program, argv);
             if (ret_exec == -1)
                 exit(1);
         }
+        pcb_list[i].pid = tmp;
     }
 
-    // wait for child processes
+    /* wait for child processes */
     for(int i = 0; i < num_proc; i++) {
         int status;
         pid_t tmp = wait(&status);
