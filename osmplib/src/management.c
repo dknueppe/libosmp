@@ -96,8 +96,6 @@ void push(OSMP_msg_node *node, OSMP_queue *queue)
     /* check if queue is empty */
     if((queue->back == queue->front) && ( queue->back == -1))
         queue->front = queue->back = index;
-    /* will assert if queue is corrupted */
-    //assert(((OSMP_base *)g_shm)->messages[queue->back].next != -1);
     node->next = -1;
     ((OSMP_base *)g_shm)->messages[queue->back].next = index;
     queue->back = index;

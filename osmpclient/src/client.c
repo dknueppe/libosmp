@@ -20,19 +20,24 @@ int main(int argc, char *argv[])
 
     int rank = -1;
     char bar[] = "hello world!";
-    char recv[1024];
+    char recv[1024] = "";
     OSMP_Datatype foobar = OSMP_BYTE;
     if((status = OSMP_Size(&rank) != OSMP_SUCCESS))
         printf("Error 1\n");
+    printf("size\n");
     if((status = OSMP_Rank(&rank) != OSMP_SUCCESS))
         printf("Error 2\n");
+    printf("rank\n");
     if((status = OSMP_Send(bar, sizeof(bar), OSMP_BYTE, rank) != OSMP_SUCCESS))
         printf("Error 3\n");
-    //if((status = OSMP_Recv(bar, rank, foobar, &rank, &rank) != OSMP_SUCCESS))
-    //    printf("Error 4\n");
-
+    printf("send\n");
+    if((status = OSMP_Recv(recv, rank, foobar, &rank, &rank) != OSMP_SUCCESS))
+        printf("Error 4\n");
+    printf("recv\n");
     if(!(status = OSMP_Finalize() == OSMP_SUCCESS))
         printf("Error\n");
+    printf("fin\n");
+    printf("message is: \"%s\"\n",recv);fflush(NULL);
     
     return 0;
 }
