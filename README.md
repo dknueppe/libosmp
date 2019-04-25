@@ -14,9 +14,9 @@
 Das Speicherlayout besteht aus zwei Teilen, dem statischen und dem dynamischen.
 Im statischen Teil stehen Infos und Speicherbereich zur verfügung, welche unabhängig
 von der Anzahl der zu startenden Prozesse sind. Im dynamischen Teil befindet sich
-ein *Prozess Control Block* pro zu startenden Prozess.
+ein *Prozess Kontroll Block* pro zu startenden Prozess.
 
-'''
+~~~~
 typedef struct {
     size_t shm_size;
     unsigned int num_proc;
@@ -28,4 +28,4 @@ typedef struct {
     OSMP_queue inbox;
     pid_t pid;
 } OSMP_pcb;
-'''
+~~~~
