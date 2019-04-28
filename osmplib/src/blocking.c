@@ -17,15 +17,16 @@
 #include <errno.h>
 #include <fcntl.h>
 #include "osmplib.h"
+#include "queue.h"
 
 int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
 {
-    const int rank;
+    int rank;
     if(OSMP_MAX_PAYLOAD_LENGTH < count)
         return OSMP_ERROR;
     if(OSMP_Rank(&rank) == OSMP_ERROR)
         return OSMP_ERROR;
-    if(dest >= base->num_proc)
+    if((unsigned)dest >= base->num_proc)
         return OSMP_ERROR;
     OSMP_msg_node* node = pop(&base->empty_list);
     node->datatype = datatype;
