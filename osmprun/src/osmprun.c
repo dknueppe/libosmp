@@ -36,7 +36,7 @@ int main (int argc, char *argv[], char *envp[])
     static const struct option opt_long[] = {
         {"child", no_argument, NULL, 'c'}
         };
-    int index_child_argv = 0;
+    int index_child_argv = argc -1;
     int option_index;
     while((opt = getopt_long(argc, argv, "n:p:c", opt_long, &option_index)) != -1) {
         switch(opt) {
@@ -48,6 +48,7 @@ int main (int argc, char *argv[], char *envp[])
             break;
         case 'c':
             index_child_argv = optind -1;
+            optind = argc;
             break;
         default:
             printf("Unrecognized option!\n");
@@ -59,7 +60,7 @@ int main (int argc, char *argv[], char *envp[])
     char shm_name[18];
     get_shm_name18(shm_name);
     char *shm_name_env = malloc(28);
-    sprintf(shm_name_env, "SHMNAME=%s", shm_name);
+    sprintf(shm_name_env, "OSMPSHM=%s", shm_name);
 
     /* create truncate and map the shared memory into the library manager */
     size_t shm_size;

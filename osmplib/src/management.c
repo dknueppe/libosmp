@@ -25,7 +25,7 @@ int g_shm_fd = 0;
 
 int OSMP_Init(int *argc, char ***argv)
 {
-    char *shm_name = getenv("SHMNAME");
+    char *shm_name = getenv("OSMPSHM");
     g_shm_fd = shm_open(shm_name, O_RDWR, 0644);
     if(g_shm_fd == -1)
         return OSMP_ERROR;
