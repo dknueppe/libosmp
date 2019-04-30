@@ -32,6 +32,7 @@ int main (int argc, char *argv[], char *envp[])
     int num_proc = NUM_PROC;
     char *program = PROG;
     
+    /* parsing input options */
     int opt;
     static const struct option opt_long[] = {
         {"child", no_argument, NULL, 'c'}
@@ -144,6 +145,7 @@ int main (int argc, char *argv[], char *envp[])
     }
 
     free(shm_name_env);
+    // no clue why this crashes
     //free(child_envp);
     
     return 0;
