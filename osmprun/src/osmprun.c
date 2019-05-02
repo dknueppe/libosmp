@@ -102,7 +102,9 @@ int main (int argc, char *argv[], char *envp[])
     while(envp[size] != NULL)
         size++;
     char **child_envp = malloc((size + 1) * sizeof(char**));
-    child_envp = envp;
+    for(int i = 0; i <= size; i++){
+        child_envp[i] = envp[i];
+    }
     child_envp[size+1] = NULL;
     child_envp[size] = shm_name_env;
 
@@ -146,7 +148,7 @@ int main (int argc, char *argv[], char *envp[])
 
     free(shm_name_env);
     // no clue why this crashes
-    //free(child_envp);
+    free(child_envp);
     
     return 0;
 }

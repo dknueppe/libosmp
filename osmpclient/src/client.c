@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
     for(int i = 0; i < argc; i++)
-        printf("%s\t",argv[i]);
+        printf("%s ",argv[i]);
     printf("\n");
     int status;
     if(!(status = OSMP_Init(&argc, &argv) == OSMP_SUCCESS))
