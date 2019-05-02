@@ -32,11 +32,12 @@ int main (int argc, char *argv[], char *envp[])
     int num_proc = NUM_PROC;
     char *program = PROG;
     
+    /* parsing input options */
     int opt;
     static const struct option opt_long[] = {
         {"child", no_argument, NULL, 'c'}
         };
-    int index_child_argv = 0;
+    int index_child_argv = argc -1;
     int option_index;
     while((opt = getopt_long(argc, argv, "n:p:c", opt_long, &option_index)) != -1) {
         switch(opt) {
@@ -48,6 +49,7 @@ int main (int argc, char *argv[], char *envp[])
             break;
         case 'c':
             index_child_argv = optind -1;
+            optind = argc;
             break;
         default:
             printf("Unrecognized option!\n");
@@ -59,7 +61,7 @@ int main (int argc, char *argv[], char *envp[])
     char shm_name[18];
     get_shm_name18(shm_name);
     char *shm_name_env = malloc(28);
-    sprintf(shm_name_env, "SHMNAME=%s", shm_name);
+    sprintf(shm_name_env, "OSMPSHM=%s", shm_name);
 
     /* create truncate and map the shared memory into the library manager */
     size_t shm_size;
@@ -100,7 +102,9 @@ int main (int argc, char *argv[], char *envp[])
     while(envp[size] != NULL)
         size++;
     char **child_envp = malloc((size + 1) * sizeof(char**));
-    child_envp = envp;
+    for(int i = 0; i <= size; i++){
+        child_envp[i] = envp[i];
+    }
     child_envp[size+1] = NULL;
     child_envp[size] = shm_name_env;
 
@@ -143,7 +147,8 @@ int main (int argc, char *argv[], char *envp[])
     }
 
     free(shm_name_env);
-    //free(child_envp);
+    // no clue why this crashes
+    free(child_envp);
     
     return 0;
 }
