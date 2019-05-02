@@ -1,4 +1,5 @@
 #include "osmplib.h"
+#include <semaphore.h>
 
 /*
  * useful defines that turn up places 

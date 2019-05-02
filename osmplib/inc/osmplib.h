@@ -9,8 +9,7 @@
  */
 
 #pragma once
-
-#include <semaphore.h>
+#include <pthread.h>
 
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
@@ -25,8 +24,6 @@
 extern void *g_shm; 
 extern int g_shm_fd;
 
-typedef void* OSMP_Request;
-
 typedef enum {
     OSMP_SHORT = 1,
     OSMP_INT,
@@ -39,6 +36,10 @@ typedef enum {
     OSMP_DOUBLE,
     OSMP_BYTE,
 } OSMP_Datatype;
+
+typedef struct {
+    pthread_t thread;
+} OSMP_Request;
 
 /**
  * @brief initializes the OSMP environment

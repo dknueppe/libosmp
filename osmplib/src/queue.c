@@ -9,7 +9,6 @@
  */
 #include <semaphore.h>
 #include "queue.h"
-#include "osmplib.h"
 
 void push(OSMP_msg_node *node, OSMP_queue *queue)
 {
