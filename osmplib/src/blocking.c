@@ -16,8 +16,8 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
-#include "osmplib.h"
 #include "queue.h"
+#include "osmplib.h"
 
 int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
 {

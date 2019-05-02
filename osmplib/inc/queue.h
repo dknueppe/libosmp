@@ -8,6 +8,7 @@
  * @date April 2019
  */
 
+#include "datastructs.h"
 #include "osmplib.h"
 
 /**

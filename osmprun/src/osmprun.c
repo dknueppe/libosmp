@@ -1,7 +1,7 @@
 /**
  * @file osmprun.c
  * 
- * @brief The osmplib header 
+ * @brief The osmp runtime manager 
  * 
  * @author Daniel Knüppe, Roderick Topütt 
  * 
@@ -147,7 +147,6 @@ int main (int argc, char *argv[], char *envp[])
     }
 
     free(shm_name_env);
-    // no clue why this crashes
     free(child_envp);
     
     return 0;
