@@ -25,12 +25,12 @@ int main(int argc, char *argv[])
     int rank = -1;
     char bar[] = "hello world!";
     char recv[1024] = "";
-    OSMP_Datatype foobar = OSMP_BYTE;
+    OSMP_Datatype foobar = OSMP_typeof(bar[0]);
     if((status = OSMP_Size(&rank) != OSMP_SUCCESS))
         printf("Error 1\n");
     if((status = OSMP_Rank(&rank) != OSMP_SUCCESS))
         printf("Error 2\n");
-    if((status = OSMP_Send(bar, sizeof(bar), OSMP_BYTE, rank) != OSMP_SUCCESS))
+    if((status = OSMP_Send(bar, sizeof(bar), OSMP_typeof(bar[0]), rank) != OSMP_SUCCESS))
         printf("Error 3\n");
     if((status = OSMP_Recv(recv, rank, foobar, &rank, &rank) != OSMP_SUCCESS))
         printf("Error 4\n");

@@ -10,6 +10,7 @@
 
 #pragma once
 #include <pthread.h>
+#include <semaphore.h>
 
 #define OSMP_SUCCESS     0
 #define OSMP_ERROR      -1
@@ -21,24 +22,50 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
+#define OSMP_typeof(X) _Generic(X, \
+                            OSMP_SHORT:             OSMP_SHORT_TI, \
+                            OSMP_INT:               OSMP_INT_TI, \
+                            OSMP_LONG:              OSMP_LONG_TI, \
+                            OSMP_UNSIGNED_CHAR:     OSMP_UNSIGNED_CHAR_TI, \
+                            OSMP_UNSIGNED_SHORT:    OSMP_UNSIGNED_SHORT_TI, \
+                            OSMP_UNSIGNED:          OSMP_UNSIGNED_TI, \
+                            OSMP_UNSIGNED_LONG:     OSMP_UNSIGNED_LONG_TI, \
+                            OSMP_FLOAT:             OSMP_FLOAT_TI, \
+                            OSMP_DOUBLE:            OSMP_DOUBLE_TI, \
+                            OSMP_BYTE:              OSMP_BYTE_TI \
+                        )
+
 extern void *g_shm; 
 extern int g_shm_fd;
 
+/* provide type info by assigning integer vals to type */
 typedef enum {
-    OSMP_SHORT = 1,
-    OSMP_INT,
-    OSMP_LONG,
-    OSMP_UNSIGNED_CHAR,
-    OSMP_UNSIGNED_SHORT,
-    OSMP_UNSIGNED,
-    OSMP_UNSIGNED_LONG,
-    OSMP_FLOAT,
-    OSMP_DOUBLE,
-    OSMP_BYTE,
+    OSMP_SHORT_TI = 1,
+    OSMP_INT_TI,
+    OSMP_LONG_TI,
+    OSMP_UNSIGNED_CHAR_TI,
+    OSMP_UNSIGNED_SHORT_TI,
+    OSMP_UNSIGNED_TI,
+    OSMP_UNSIGNED_LONG_TI,
+    OSMP_FLOAT_TI,
+    OSMP_DOUBLE_TI,
+    OSMP_BYTE_TI,
 } OSMP_Datatype;
+
+typedef short           OSMP_SHORT;
+typedef int             OSMP_INT;
+typedef long            OSMP_LONG;
+typedef unsigned char   OSMP_UNSIGNED_CHAR;
+typedef unsigned short  OSMP_UNSIGNED_SHORT;
+typedef unsigned int    OSMP_UNSIGNED;
+typedef unsigned long   OSMP_UNSIGNED_LONG;
+typedef float           OSMP_FLOAT;
+typedef double          OSMP_DOUBLE;
+typedef char            OSMP_BYTE;
 
 typedef struct {
     pthread_t thread;
+    sem_t status;
 } OSMP_Request;
 
 /**

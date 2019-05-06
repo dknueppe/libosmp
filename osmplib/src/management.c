@@ -85,3 +85,20 @@ int OSMP_Size(int *size)
     *size = ((OSMP_base *)g_shm)->num_proc;
     return OSMP_SUCCESS;
 }
+
+size_t OSMP_sizeof(OSMP_Datatype dt)
+{
+    switch(dt) {
+        case OSMP_SHORT_TI: return sizeof(OSMP_SHORT);
+        case OSMP_INT_TI: return sizeof(OSMP_INT);
+        case OSMP_LONG_TI: return sizeof(OSMP_LONG);
+        case OSMP_UNSIGNED_CHAR_TI: return sizeof(OSMP_UNSIGNED_CHAR);;
+        case OSMP_UNSIGNED_SHORT_TI: return sizeof(OSMP_UNSIGNED_SHORT);
+        case OSMP_UNSIGNED_TI: return sizeof(OSMP_UNSIGNED);
+        case OSMP_UNSIGNED_LONG_TI: return sizeof(OSMP_UNSIGNED_LONG);
+        case OSMP_FLOAT_TI: return sizeof(OSMP_FLOAT);
+        case OSMP_DOUBLE_TI: return sizeof(OSMP_DOUBLE);
+        case OSMP_BYTE_TI: return sizeof(OSMP_BYTE);
+        default: printf("Not an OSMP_Datatype!\n"); exit(1);
+   }
+}

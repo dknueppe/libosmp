@@ -96,15 +96,14 @@ int main (int argc, char *argv[], char *envp[])
             exit(1);
     }
 
-    /* rearrange argv and envp for child execution */
+    /* prepare child_argv from argv for the child execve */
     int size = argc - index_child_argv;
     char **child_argv = malloc(size * sizeof(char**));
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++)
         child_argv[i] = argv[i + index_child_argv];
-        printf("child argv[%d] = %s\n", i, child_argv[i]);
-    }
     child_argv[size] = NULL;
     child_argv[0] = program;
+    /* prepare child_envp from envp for the child execve */
     size = 0;
     while(envp[size] != NULL)
         size++;

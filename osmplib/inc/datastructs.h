@@ -36,3 +36,5 @@ typedef struct {
     OSMP_queue inbox;
     pid_t pid;
 } OSMP_pcb;
+
+size_t OSMP_sizeof(OSMP_Datatype dt);
