@@ -23,8 +23,12 @@
 void *g_shm = NULL;
 int g_shm_fd = 0;
 
+/* pragmas are to shut the compiler up about unused argc and argv */
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 int OSMP_Init(int *argc, char ***argv)
 {
+#pragma GCC diagnostic pop
+
     char *shm_name = getenv("OSMPSHM");
     g_shm_fd = shm_open(shm_name, O_RDWR, 0644);
     if(g_shm_fd == -1)
@@ -89,16 +93,16 @@ int OSMP_Size(int *size)
 size_t OSMP_sizeof(OSMP_Datatype dt)
 {
     switch(dt) {
-        case OSMP_SHORT_TI: return sizeof(OSMP_SHORT);
-        case OSMP_INT_TI: return sizeof(OSMP_INT);
-        case OSMP_LONG_TI: return sizeof(OSMP_LONG);
-        case OSMP_UNSIGNED_CHAR_TI: return sizeof(OSMP_UNSIGNED_CHAR);;
-        case OSMP_UNSIGNED_SHORT_TI: return sizeof(OSMP_UNSIGNED_SHORT);
-        case OSMP_UNSIGNED_TI: return sizeof(OSMP_UNSIGNED);
-        case OSMP_UNSIGNED_LONG_TI: return sizeof(OSMP_UNSIGNED_LONG);
-        case OSMP_FLOAT_TI: return sizeof(OSMP_FLOAT);
-        case OSMP_DOUBLE_TI: return sizeof(OSMP_DOUBLE);
-        case OSMP_BYTE_TI: return sizeof(OSMP_BYTE);
+        case OSMP_SHORT_TI:             return sizeof(OSMP_SHORT);
+        case OSMP_INT_TI:               return sizeof(OSMP_INT);
+        case OSMP_LONG_TI:              return sizeof(OSMP_LONG);
+        case OSMP_UNSIGNED_CHAR_TI:     return sizeof(OSMP_UNSIGNED_CHAR);
+        case OSMP_UNSIGNED_SHORT_TI:    return sizeof(OSMP_UNSIGNED_SHORT);
+        case OSMP_UNSIGNED_TI:          return sizeof(OSMP_UNSIGNED);
+        case OSMP_UNSIGNED_LONG_TI:     return sizeof(OSMP_UNSIGNED_LONG);
+        case OSMP_FLOAT_TI:             return sizeof(OSMP_FLOAT);
+        case OSMP_DOUBLE_TI:            return sizeof(OSMP_DOUBLE);
+        case OSMP_BYTE_TI:              return sizeof(OSMP_BYTE);
         default: printf("Not an OSMP_Datatype!\n"); exit(1);
    }
 }

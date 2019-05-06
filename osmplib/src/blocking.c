@@ -30,7 +30,7 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
         return OSMP_ERROR;
     OSMP_msg_node* node = pop(&base->empty_list);
     node->datatype = datatype;
-    node->len = count;
+    node->len = count * OSMP_sizeof(datatype);
     node->receiver = dest;
     node->sender = rank;
     memcpy(node->msg_buf, buf, count);
@@ -46,7 +46,7 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
     OSMP_msg_node *node = pop(&pcb_list[rank].inbox);
     *source = node->sender;
     *len = node->len;
-    memcpy(buf, node->msg_buf, *len);
+    memcpy(buf, node->msg_buf, count * OSMP_sizeof(datatype));
     int ret;
     if(datatype != node->datatype)
         ret = node->datatype;
