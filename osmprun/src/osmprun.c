@@ -97,14 +97,20 @@ int main (int argc, char *argv[], char *envp[])
     }
 
     /* rearrange argv and envp for child execution */
-    argv[index_child_argv] = program;
-    int size = 0;
+    int size = argc - index_child_argv;
+    char **child_argv = malloc(size * sizeof(char**));
+    for(int i = 0; i < size; i++) {
+        child_argv[i] = argv[i + index_child_argv];
+        printf("child argv[%d] = %s\n", i, child_argv[i]);
+    }
+    child_argv[size] = NULL;
+    child_argv[0] = program;
+    size = 0;
     while(envp[size] != NULL)
         size++;
     char **child_envp = malloc((size + 1) * sizeof(char**));
-    for(int i = 0; i <= size; i++){
+    for(int i = 0; i <= size; i++)
         child_envp[i] = envp[i];
-    }
     child_envp[size+1] = NULL;
     child_envp[size] = shm_name_env;
 
@@ -117,7 +123,7 @@ int main (int argc, char *argv[], char *envp[])
         if(tmp == -1) {
             exit(1);
         } else if (tmp == 0) {
-            ret_exec = execve(program, argv + index_child_argv, child_envp);
+            ret_exec = execve(program, child_argv, child_envp);
             if (ret_exec == -1)
                 exit(1);
         }
@@ -147,6 +153,7 @@ int main (int argc, char *argv[], char *envp[])
     }
 
     free(shm_name_env);
+    free(child_argv);
     free(child_envp);
     
     return 0;
