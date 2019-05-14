@@ -37,4 +37,15 @@ typedef struct {
     pid_t pid;
 } OSMP_pcb;
 
+typedef struct {
+    void **recv_buf;
+    const void **send_buf;
+    int *count;
+    OSMP_Datatype *datatype;
+    int *dest;
+    int **source;
+    int **len;
+    OSMP_Request *request;
+} OSMP_async_arglist;
+
 size_t OSMP_sizeof(OSMP_Datatype dt);

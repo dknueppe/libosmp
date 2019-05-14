@@ -66,8 +66,9 @@ typedef double          OSMP_DOUBLE;
 typedef char            OSMP_BYTE;
 
 typedef struct {
+    OSMP_Request *this;
     pthread_t thread;
-    sem_t status;
+    int status;
 } OSMP_Request;
 
 /**
@@ -175,9 +176,10 @@ int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *l
  * does not block and returns imidately.
  * 
  * @param request Information about the transfer
+ * @param flag Set to 1 if request is finished 0 otherwise
  * @return int Returns 0 on success, ERROR code otherwise
  */
-int OSMP_Test(OSMP_Request request);
+int OSMP_Test(OSMP_Request request, int *flag);
 
 /**
  * @brief Used to wait for the Operation, linked to request, to finish.
