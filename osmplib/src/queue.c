@@ -12,10 +12,10 @@
 
 void push(OSMP_msg_node *node, OSMP_queue *queue)
 {
-    /* lock further access to queue */
-    sem_wait(&queue->queue_lock);
     /* make sure not to push more than the queue can (or should) handle */
     sem_wait(&queue->max_length);
+    /* lock further access to queue */
+    sem_wait(&queue->queue_lock);
 
     /* get index for messages[] in shm from node */
     unsigned int index = node - base->messages;
@@ -34,10 +34,10 @@ void push(OSMP_msg_node *node, OSMP_queue *queue)
 
 OSMP_msg_node *pop(OSMP_queue *queue)
 {
-    /* lock further access to queue */
-    sem_wait(&queue->queue_lock);
     /* make sure the queue is not empty / wait for it to get a new node */
     sem_wait(&queue->availabe);
+    /* lock further access to queue */
+    sem_wait(&queue->queue_lock);
 
     unsigned int index = queue->front;
     queue->front = base->messages[queue->front].next;
@@ -46,6 +46,7 @@ OSMP_msg_node *pop(OSMP_queue *queue)
     sem_post(&queue->max_length);
     /* unlock access to the queue */
     sem_post(&queue->queue_lock);
+
     return &base->messages[index];
 }
 
