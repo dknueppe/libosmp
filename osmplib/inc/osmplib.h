@@ -22,6 +22,7 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #define OSMP_typeof(X) _Generic(X, \
                             OSMP_SHORT:             OSMP_SHORT_TI, \
                             OSMP_INT:               OSMP_INT_TI, \
@@ -34,6 +35,7 @@
                             OSMP_DOUBLE:            OSMP_DOUBLE_TI, \
                             OSMP_BYTE:              OSMP_BYTE_TI \
                         )
+#pragma GCC diagnostic pop
 
 extern void *g_shm; 
 extern int g_shm_fd;
@@ -64,8 +66,9 @@ typedef double          OSMP_DOUBLE;
 typedef char            OSMP_BYTE;
 
 typedef struct {
+    OSMP_Request *this;
     pthread_t thread;
-    sem_t status;
+    int status;
 } OSMP_Request;
 
 /**
@@ -131,7 +134,63 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest);
 int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len);
 
 /**
- * @brief calling processes are freeing used shared resources
+ * @brief Used to send messages to other child processes
+ * 
+ * The routine sends a Message to the process number specified
+ * by 'dest'. The message contains 'count' elements of type 
+ * 'datatype'. The message starts at 'buf'. The call is asynchrounos
+ * and thus returns imidiately. It can be waited for with OSMP_Wait().
+ * 
+ * @param buf Adresse of message
+ * @param count Length of message
+ * @param datatype Library message datatype
+ * @param dest Receiving child process
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Isend(const void *buf, int count ,OSMP_Datatype datatype, int dest,
+               OSMP_Request request);
+
+/**
+ * @brief Used to retrieve received messages from other processes
+ * 
+ * The calling Process receives a message of a maximum of 'count' elements
+ * of type 'datatype'. The message is written at 'buf' of the calling process.
+ * 'source' contains the number of the child processe which has send the message.
+ * 'len' contains the actual length of the message. The call is asynchrounus thus
+ * and thus returns imidiately. It can be waited for with OSMP_Wait()
+ * 
+ * @param buf Adress of message in local memory
+ * @param count number of elements
+ * @param datatype Library message datatype
+ * @param source number of Sender
+ * @param len Actual length of message
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len,
+               OSMP_Request request);
+
+/**
+ * @brief Used to test the state of the operation linked to request. The routine
+ * does not block and returns imidately.
+ * 
+ * @param request Information about the transfer
+ * @param flag Set to 1 if request is finished 0 otherwise
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Test(OSMP_Request request, int *flag);
+
+/**
+ * @brief Used to wait for the Operation, linked to request, to finish.
+ * 
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Wait(OSMP_Request request);
+
+/**
+ * @brief Calling processes are freeing used shared resources
  * 
  * @return int Returns 0 on success, ERROR code otherwise
  */
