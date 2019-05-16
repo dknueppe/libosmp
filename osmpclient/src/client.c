@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         printf("Error\n");
 
     int rank = -1;
-    char bar[] = "hello world!";
+    osmp_byte bar[] = "hello world!";
     char recv[1024] = "";
     OSMP_Datatype foobar = OSMP_typeof(bar[0]);
     if((status = OSMP_Size(&rank) != OSMP_SUCCESS))

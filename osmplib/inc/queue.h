@@ -33,7 +33,7 @@ OSMP_msg_node *pop(OSMP_queue *queue);
  * @param queue init this
  * @return int Returns 0 on success, ERROR code otherwise
  */
-int init_queue(OSMP_queue *queue, unsigned int max_length);
+int init_queue(OSMP_queue *queue, unsigned int slots_available);
 
 /**
  * @brief deinitializes the queue

@@ -14,6 +14,6 @@ typedef enum {
     async_trans_incomplete
 } OSMP_thread_state;
 
-int send_wrapper(void *arglist);
+void *send_wrapper(void *arglist);
 
-int recv_wrapper(void *arglist);
+void *recv_wrapper(void *arglist);

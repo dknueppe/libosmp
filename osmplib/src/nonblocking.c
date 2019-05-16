@@ -50,7 +50,7 @@ int OSMP_Isend(const void *buf, int count, OSMP_Datatype datatype, int dest,
                                   .len = NULL,
                                   .request = &request};
 
-    //pthread_create(request.thread)
+    pthread_create(&(request.this->thread), NULL, &send_wrapper,&arglist);
 
     return OSMP_SUCCESS;
 }
@@ -67,5 +67,31 @@ int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *l
                                   .len = &len,
                                   .request = &request};
 
+    pthread_create(&(request.this->thread), NULL, &recv_wrapper, &arglist);
+
     return OSMP_SUCCESS;
 }
+
+#define args *((OSMP_async_arglist *)arglist)
+
+void *send_wrapper(void *arglist)
+{
+    (args->request).this->status = async_trans_incomplete;
+    if(OSMP_Send(args->send_buf, args->count, args->datatype, args->dest) == OSMP_ERROR)
+        pthread_exit(NULL);
+    (args->request).this->status = async_trans_complete;
+
+    pthread_exit(&(args->request).this->status);
+}
+
+void *recv_wrapper(void *arglist)
+{
+    (args->request).this->status = async_trans_incomplete;
+    if(OSMP_Recv(args->recv_buf, args->count, args->datatype, args->source, args->len) == OSMP_ERROR)
+        pthread_exit(NULL);
+    (args->request).this->status = async_trans_complete;
+
+    pthread_exit(&(args->request).this->status);
+}
+
+#undef args

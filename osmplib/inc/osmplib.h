@@ -24,16 +24,16 @@
 
 #pragma GCC diagnostic ignored "-Wpedantic"
 #define OSMP_typeof(X) _Generic(X, \
-                            OSMP_SHORT:             OSMP_SHORT_TI, \
-                            OSMP_INT:               OSMP_INT_TI, \
-                            OSMP_LONG:              OSMP_LONG_TI, \
-                            OSMP_UNSIGNED_CHAR:     OSMP_UNSIGNED_CHAR_TI, \
-                            OSMP_UNSIGNED_SHORT:    OSMP_UNSIGNED_SHORT_TI, \
-                            OSMP_UNSIGNED:          OSMP_UNSIGNED_TI, \
-                            OSMP_UNSIGNED_LONG:     OSMP_UNSIGNED_LONG_TI, \
-                            OSMP_FLOAT:             OSMP_FLOAT_TI, \
-                            OSMP_DOUBLE:            OSMP_DOUBLE_TI, \
-                            OSMP_BYTE:              OSMP_BYTE_TI \
+                            osmp_short:             OSMP_SHORT, \
+                            osmp_int:               OSMP_INT, \
+                            osmp_long:              OSMP_LONG, \
+                            osmp_unsigned_char:     OSMP_UNSIGNED_CHAR, \
+                            osmp_unsigned_short:    OSMP_UNSIGNED_SHORT, \
+                            osmp_unsigned_int:      OSMP_UNSIGNED, \
+                            osmp_unsigned_long:     OSMP_UNSIGNED_LONG, \
+                            osmp_float:             OSMP_FLOAT, \
+                            osmp_double:            OSMP_DOUBLE, \
+                            osmp_byte:              OSMP_BYTE \
                         )
 #pragma GCC diagnostic pop
 
@@ -42,28 +42,30 @@ extern int g_shm_fd;
 
 /* provide type info by assigning integer vals to type */
 typedef enum {
-    OSMP_SHORT_TI = 1,
-    OSMP_INT_TI,
-    OSMP_LONG_TI,
-    OSMP_UNSIGNED_CHAR_TI,
-    OSMP_UNSIGNED_SHORT_TI,
-    OSMP_UNSIGNED_TI,
-    OSMP_UNSIGNED_LONG_TI,
-    OSMP_FLOAT_TI,
-    OSMP_DOUBLE_TI,
-    OSMP_BYTE_TI,
+    OSMP_UNDEFINED,
+    OSMP_SHORT,
+    OSMP_INT,
+    OSMP_LONG,
+    OSMP_UNSIGNED_CHAR,
+    OSMP_UNSIGNED_SHORT,
+    OSMP_UNSIGNED,
+    OSMP_UNSIGNED_LONG,
+    OSMP_FLOAT,
+    OSMP_DOUBLE,
+    OSMP_BYTE,
+    OSMP_UNDEFINED_UPPER,
 } OSMP_Datatype;
 
-typedef short           OSMP_SHORT;
-typedef int             OSMP_INT;
-typedef long            OSMP_LONG;
-typedef unsigned char   OSMP_UNSIGNED_CHAR;
-typedef unsigned short  OSMP_UNSIGNED_SHORT;
-typedef unsigned int    OSMP_UNSIGNED;
-typedef unsigned long   OSMP_UNSIGNED_LONG;
-typedef float           OSMP_FLOAT;
-typedef double          OSMP_DOUBLE;
-typedef char            OSMP_BYTE;
+typedef short           osmp_short;
+typedef int             osmp_int;
+typedef long            osmp_long;
+typedef unsigned char   osmp_unsigned_char;
+typedef unsigned short  osmp_unsigned_short;
+typedef unsigned int    osmp_unsigned_int;
+typedef unsigned long   osmp_unsigned_long;
+typedef float           osmp_float;
+typedef double          osmp_double;
+typedef char            osmp_byte;
 
 typedef struct OSMP_Request OSMP_Request;
 struct OSMP_Request {

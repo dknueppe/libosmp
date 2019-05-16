@@ -20,8 +20,8 @@ typedef struct {
 typedef struct {
     int front;
     int back;
-    sem_t max_length;
-    sem_t availabe;
+    sem_t slots_available;
+    sem_t slots_in_use;
     sem_t queue_lock;
 } OSMP_queue;
 

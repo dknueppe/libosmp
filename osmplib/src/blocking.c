@@ -22,7 +22,11 @@
 int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
 {
     int rank;
+    if(buf == NULL)
+        return OSMP_ERROR;
     if(OSMP_MAX_PAYLOAD_LENGTH < count)
+        return OSMP_ERROR;
+    if(datatype < OSMP_UNDEFINED_TI || datatype > OSMP_UNDEFINED_UPPER_TI)
         return OSMP_ERROR;
     if(OSMP_Rank(&rank) == OSMP_ERROR)
         return OSMP_ERROR;
