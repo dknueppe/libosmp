@@ -46,6 +46,7 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
     OSMP_msg_node *node = pop(&pcb_list[rank].inbox);
     *source = node->sender;
     *len = node->len;
+    printf("len: %d, count: %d\n", *len, count);
     memcpy(buf, node->msg_buf, count * OSMP_sizeof(datatype));
     int ret;
     if(datatype != node->datatype)

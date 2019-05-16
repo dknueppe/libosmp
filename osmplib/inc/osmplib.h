@@ -65,11 +65,12 @@ typedef float           OSMP_FLOAT;
 typedef double          OSMP_DOUBLE;
 typedef char            OSMP_BYTE;
 
-typedef struct {
+typedef struct OSMP_Request OSMP_Request;
+struct OSMP_Request {
     OSMP_Request *this;
     pthread_t thread;
     int status;
-} OSMP_Request;
+};
 
 /**
  * @brief initializes the OSMP environment
