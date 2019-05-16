@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         printf("Error 2\n");
     if((status = OSMP_Send(bar, sizeof(bar), OSMP_typeof(bar[0]), rank) != OSMP_SUCCESS))
         printf("Error 3\n");
-    if((status = OSMP_Recv(recv, rank, foobar, &rank, &rank) != OSMP_SUCCESS))
+    if((status = OSMP_Recv(recv, 13, foobar, &rank, &rank) != OSMP_SUCCESS))
         printf("Error 4\n");
     if((status = OSMP_Finalize() != OSMP_SUCCESS))
         printf("Error\n");
