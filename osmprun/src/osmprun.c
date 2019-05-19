@@ -66,23 +66,23 @@ int main (int argc, char *argv[], char *envp[])
     /* create truncate and map the shared memory into the library manager */
     size_t shm_size;
     shm_size = (sizeof(OSMP_base) + (num_proc * sizeof(OSMP_pcb)));
-    g_shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
-    if(g_shm_fd == -1) {
+    osmp_globals.shm_fd = shm_open(shm_name, O_CREAT | O_EXCL | O_RDWR, 0644);
+    if(osmp_globals.shm_fd == -1) {
         printf("Error calling shm_open:\n%s",strerror(errno));
         exit(1);
     }
-    if(ftruncate(g_shm_fd, shm_size) == -1) {
+    if(ftruncate(osmp_globals.shm_fd, shm_size) == -1) {
         printf("Error calling ftruncate:\n%s",strerror(errno));
         exit(1);
     }
-    g_shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
-    if(g_shm == MAP_FAILED) {
+    osmp_globals.shm_base = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, osmp_globals.shm_fd, 0);
+    if(osmp_globals.shm_base == MAP_FAILED) {
         printf("Error calling mmap:\n%s",strerror(errno));
         exit(1);
     }
 
     /* initialize the shared memory to its default values */
-    memset(g_shm, -1, shm_size);
+    memset(osmp_globals.shm_base, -1, shm_size);
     base->shm_size = shm_size;
     base->num_proc = num_proc;
     /* initialize the semaphores in the empty list and assign messages */
@@ -142,7 +142,7 @@ int main (int argc, char *argv[], char *envp[])
         destroy_queue(&pcb_list[i].inbox);
 
     /* free up the shared memory */
-    if(munmap(g_shm, shm_size) == -1) {
+    if(munmap(osmp_globals.shm_base, shm_size) == -1) {
         printf("Error calling munmap:\n%s",strerror(errno));
         exit(1);
     }

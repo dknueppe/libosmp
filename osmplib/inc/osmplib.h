@@ -22,7 +22,6 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
-#pragma GCC diagnostic ignored "-Wpedantic"
 #define OSMP_typeof(X) _Generic(X, \
                             osmp_short:             OSMP_SHORT, \
                             osmp_int:               OSMP_INT, \
@@ -35,10 +34,6 @@
                             osmp_double:            OSMP_DOUBLE, \
                             osmp_byte:              OSMP_BYTE \
                         )
-#pragma GCC diagnostic pop
-
-extern void *g_shm; 
-extern int g_shm_fd;
 
 /* provide type info by assigning integer vals to type */
 typedef enum {

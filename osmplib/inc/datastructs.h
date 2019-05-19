@@ -1,12 +1,21 @@
 #include "osmplib.h"
 #include <semaphore.h>
 
+typedef struct {
+    void *shm_base;
+    int shm_fd;
+    int rank;
+} OSMP_globals;
+
+extern OSMP_globals osmp_globals;
+
 /*
  * useful defines that turn up places 
  * also this is the actual memory layout 
  */
-#define base ((OSMP_base*)g_shm)
-#define pcb_list ((OSMP_pcb*)(((char*)g_shm)+sizeof(OSMP_base)))
+#define base ((OSMP_base*)osmp_globals.shm_base)
+#define pcb_list ((OSMP_pcb*)(((char*)osmp_globals.shm_base)+sizeof(OSMP_base)))
+
 
 typedef struct {
     int next;

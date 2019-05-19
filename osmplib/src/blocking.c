@@ -26,7 +26,7 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
         return OSMP_ERROR;
     if(OSMP_MAX_PAYLOAD_LENGTH < count)
         return OSMP_ERROR;
-    if(datatype < OSMP_UNDEFINED_TI || datatype > OSMP_UNDEFINED_UPPER_TI)
+    if(datatype < OSMP_UNDEFINED || datatype > OSMP_UNDEFINED_UPPER)
         return OSMP_ERROR;
     if(OSMP_Rank(&rank) == OSMP_ERROR)
         return OSMP_ERROR;
@@ -50,7 +50,6 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
     OSMP_msg_node *node = pop(&pcb_list[rank].inbox);
     *source = node->sender;
     *len = node->len;
-    printf("len: %d, count: %d\n", *len, count);
     memcpy(buf, node->msg_buf, count * OSMP_sizeof(datatype));
     int ret;
     if(datatype != node->datatype)

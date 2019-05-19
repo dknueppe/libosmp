@@ -20,8 +20,7 @@
 #include "queue.h"
 #include "osmplib.h"
 
-void *g_shm = NULL;
-int g_shm_fd = 0;
+OSMP_globals osmp_globals = {.shm_base = NULL};
 
 /* pragmas are to shut the compiler up about unused argc and argv */
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -30,39 +29,18 @@ int OSMP_Init(int *argc, char ***argv)
 #pragma GCC diagnostic pop
 
     char *shm_name = getenv("OSMPSHM");
-    g_shm_fd = shm_open(shm_name, O_RDWR, 0644);
-    if(g_shm_fd == -1)
+    osmp_globals.shm_fd = shm_open(shm_name, O_RDWR, 0644);
+    if(osmp_globals.shm_fd == -1)
         return OSMP_ERROR;
 
-    g_shm = mmap(NULL, sizeof(size_t), PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
-    if(g_shm == MAP_FAILED)
+    osmp_globals.shm_base = mmap(NULL, sizeof(size_t), PROT_READ | PROT_WRITE, MAP_SHARED, osmp_globals.shm_fd, 0);
+    if(osmp_globals.shm_base == MAP_FAILED)
         return OSMP_ERROR;
-    size_t shm_size = *(size_t *)g_shm;
-    munmap(g_shm,sizeof(size_t));
+    size_t shm_size = *(size_t *)osmp_globals.shm_base;
+    munmap(osmp_globals.shm_base,sizeof(size_t));
 
-    g_shm = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, g_shm_fd, 0);
-    if(g_shm == MAP_FAILED)
-        return OSMP_ERROR;
-
-    return OSMP_SUCCESS;
-}
-
-int OSMP_Finalize(void)
-{
-    if(g_shm == NULL)
-        return OSMP_SUCCESS;
-
-    if(munmap(g_shm, *(size_t *)g_shm) == -1)
-        return OSMP_ERROR;
-    
-    g_shm = NULL;
-
-    return OSMP_SUCCESS;
-}
-
-int OSMP_Rank(int *rank)
-{
-    if(g_shm == NULL)
+    osmp_globals.shm_base = mmap(NULL, shm_size, PROT_READ | PROT_WRITE, MAP_SHARED, osmp_globals.shm_fd, 0);
+    if(osmp_globals.shm_base == MAP_FAILED)
         return OSMP_ERROR;
 
     int size;
@@ -73,20 +51,43 @@ int OSMP_Rank(int *rank)
 
     for(int i = 0; i < size; i++) {
         if(pid == pcb_list[i].pid) {
-            *rank = i;
+            osmp_globals.rank = i;
             return OSMP_SUCCESS;
         }
     }
 
+    OSMP_Finalize();
     return OSMP_ERROR;
+}
+
+int OSMP_Finalize(void)
+{
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_SUCCESS;
+
+    if(munmap(osmp_globals.shm_base, *(size_t *)osmp_globals.shm_base) == -1)
+        return OSMP_ERROR;
+    
+    osmp_globals.shm_base = NULL;
+
+    return OSMP_SUCCESS;
+}
+
+int OSMP_Rank(int *rank)
+{
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
+
+    *rank = osmp_globals.rank;
+    return OSMP_SUCCESS;
 }
 
 int OSMP_Size(int *size)
 {
-    if(g_shm == NULL)
+    if(osmp_globals.shm_base == NULL)
         return OSMP_ERROR;
 
-    *size = ((OSMP_base *)g_shm)->num_proc;
+    *size = base->num_proc;
     return OSMP_SUCCESS;
 }
 
