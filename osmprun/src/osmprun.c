@@ -24,7 +24,7 @@
 #include "osmprun.h"
 #include "queue.h"
 
-#define NUM_PROC 3
+#define NUM_PROC 1
 #define PROG "build/osmpclient"
 
 int main (int argc, char *argv[], char *envp[])
@@ -35,12 +35,20 @@ int main (int argc, char *argv[], char *envp[])
     /* parsing input options */
     int opt;
     static const struct option opt_long[] = {
-        {"child", no_argument, NULL, 'c'}
+        {"child",   no_argument, NULL, 'c'},
+        {"help",    no_argument, NULL, 'h'},
+        {"version", no_argument, NULL, 'V'}
         };
     int index_child_argv = argc -1;
     int option_index;
-    while((opt = getopt_long(argc, argv, "n:p:c", opt_long, &option_index)) != -1) {
+    while((opt = getopt_long(argc, argv, "Vhn:p:c", opt_long, &option_index)) != -1) {
         switch(opt) {
+        case 'h':
+            print_help();
+            break;
+        case 'V':
+            print_version();
+            break;
         case 'n':
             num_proc = atoi(optarg);
             break;
@@ -52,8 +60,8 @@ int main (int argc, char *argv[], char *envp[])
             optind = argc;
             break;
         default:
-            printf("Unrecognized option!\n");
-            exit(EXIT_FAILURE);
+            print_help();
+            break;
         }
     }
 
@@ -156,6 +164,22 @@ int main (int argc, char *argv[], char *envp[])
     free(child_envp);
     
     return 0;
+}
+
+void print_help()
+{
+    char help[] = 
+#include "help.txt"
+    printf("%s", help);
+    exit(0);
+}
+
+void print_version()
+{
+    char version[] =
+#include "version.txt"
+    printf("%s", version);
+    exit(0);
 }
 
 void get_shm_name18(char c[])

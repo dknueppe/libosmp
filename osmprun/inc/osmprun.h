@@ -10,4 +10,8 @@
 
 #pragma once
 
+void print_help();
+
+void print_version();
+
 void get_shm_name18(char *c);

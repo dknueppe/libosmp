@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <semaphore.h>
 #include "osmplib.h"
 #include "datastructs.h"
@@ -16,14 +17,17 @@
 
 int OSMP_CreateRequest(OSMP_Request *request)
 {
-    request->this = request;
+    request->self = request;
     request->status = async_trans_prepared;
+    request->args = malloc(sizeof(OSMP_async_arglist));
     return OSMP_SUCCESS;
 }
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-int OSMP_RemoveRequest(OSMP_Request *request) { return OSMP_SUCCESS; }
-#pragma GCC diagnostic pop
+int OSMP_RemoveRequest(OSMP_Request *request) 
+{
+    free(request->args);
+    return OSMP_SUCCESS; 
+}
 
 int OSMP_Wait(OSMP_Request request)
 {
@@ -41,16 +45,16 @@ int OSMP_Test(OSMP_Request request, int *flag)
 int OSMP_Isend(const void *buf, int count, OSMP_Datatype datatype, int dest,
                OSMP_Request request)
 {
-    OSMP_async_arglist arglist = {.send_buf = &buf, 
-                                  .recv_buf = NULL,
-                                  .count = &count,
-                                  .datatype = &datatype,
-                                  .dest = &dest,
-                                  .source = NULL,
-                                  .len = NULL,
-                                  .request = &request};
+    ((OSMP_async_arglist *)((request.self)->args))->send_buf = &buf;
+    ((OSMP_async_arglist *)((request.self)->args))->recv_buf = NULL;
+    ((OSMP_async_arglist *)((request.self)->args))->count    = &count;
+    ((OSMP_async_arglist *)((request.self)->args))->datatype = &datatype;
+    ((OSMP_async_arglist *)((request.self)->args))->dest     = &dest;
+    ((OSMP_async_arglist *)((request.self)->args))->source   = NULL;
+    ((OSMP_async_arglist *)((request.self)->args))->len      = NULL;
+    ((OSMP_async_arglist *)((request.self)->args))->request  = request.self;
 
-    pthread_create(&(request.this->thread), NULL, &send_wrapper,&arglist);
+    pthread_create(&(request.self->thread), NULL, &send_wrapper, request.self->args);
 
     return OSMP_SUCCESS;
 }
@@ -58,16 +62,16 @@ int OSMP_Isend(const void *buf, int count, OSMP_Datatype datatype, int dest,
 int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len,
                OSMP_Request request)
 {
-    OSMP_async_arglist arglist = {.send_buf = NULL, 
-                                  .recv_buf = &buf,
-                                  .count = &count,
-                                  .datatype = &datatype,
-                                  .dest = NULL,
-                                  .source = &source,
-                                  .len = &len,
-                                  .request = &request};
+    ((OSMP_async_arglist *)((request.self)->args))->send_buf = NULL;
+    ((OSMP_async_arglist *)((request.self)->args))->recv_buf = &buf;
+    ((OSMP_async_arglist *)((request.self)->args))->count    = &count;
+    ((OSMP_async_arglist *)((request.self)->args))->datatype = &datatype;
+    ((OSMP_async_arglist *)((request.self)->args))->dest     = NULL;
+    ((OSMP_async_arglist *)((request.self)->args))->source   = &source;
+    ((OSMP_async_arglist *)((request.self)->args))->len      = &len;
+    ((OSMP_async_arglist *)((request.self)->args))->request  = request.self;
 
-    pthread_create(&(request.this->thread), NULL, &recv_wrapper, &arglist);
+    pthread_create(&(request.self->thread), NULL, &recv_wrapper, request.self->args);
 
     return OSMP_SUCCESS;
 }
@@ -76,22 +80,22 @@ int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *l
 
 void *send_wrapper(void *arglist)
 {
-    (args->request).this->status = async_trans_incomplete;
+    (args->request).self->status = async_trans_incomplete;
     if(OSMP_Send(args->send_buf, args->count, args->datatype, args->dest) == OSMP_ERROR)
         pthread_exit(NULL);
-    (args->request).this->status = async_trans_complete;
+    (args->request).self->status = async_trans_complete;
 
-    pthread_exit(&(args->request).this->status);
+    pthread_exit(&(args->request).self->status);
 }
 
 void *recv_wrapper(void *arglist)
 {
-    (args->request).this->status = async_trans_incomplete;
+    (args->request).self->status = async_trans_incomplete;
     if(OSMP_Recv(args->recv_buf, args->count, args->datatype, args->source, args->len) == OSMP_ERROR)
         pthread_exit(NULL);
-    (args->request).this->status = async_trans_complete;
+    (args->request).self->status = async_trans_complete;
 
-    pthread_exit(&(args->request).this->status);
+    pthread_exit(&(args->request).self->status);
 }
 
 #undef args

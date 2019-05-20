@@ -64,9 +64,10 @@ typedef char            osmp_byte;
 
 typedef struct OSMP_Request OSMP_Request;
 struct OSMP_Request {
-    OSMP_Request *this;
+    OSMP_Request *self;
     pthread_t thread;
     int status;
+    void *args;
 };
 
 /**
@@ -186,6 +187,22 @@ int OSMP_Test(OSMP_Request request, int *flag);
  * @return int Returns 0 on success, ERROR code otherwise
  */
 int OSMP_Wait(OSMP_Request request);
+
+/**
+ * @brief preparation for asynchrounus communication
+ * 
+ * @param request The information required for the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_CreateRequest(OSMP_Request *request);
+
+/**
+ * @brief cleanup of request and related information
+ * 
+ * @param request The request used for the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_RemoveRequest(OSMP_Request *request);
 
 /**
  * @brief Calling processes are freeing used shared resources
