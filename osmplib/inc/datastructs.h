@@ -5,13 +5,14 @@ typedef struct {
     void *shm_base;
     int shm_fd;
     int rank;
+
 } OSMP_globals;
 
 extern OSMP_globals osmp_globals;
 
 /*
  * useful defines that turn up places 
- * also this is the actual memory layout 
+ * also this represents the actual memory layout 
  */
 #define base ((OSMP_base*)osmp_globals.shm_base)
 #define pcb_list ((OSMP_pcb*)(((char*)osmp_globals.shm_base)+sizeof(OSMP_base)))
@@ -21,7 +22,7 @@ typedef struct {
     int next;
     int sender;
     int receiver;
-    int len;
+    unsigned int len;
     char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
     OSMP_Datatype datatype;
 } OSMP_msg_node;

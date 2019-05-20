@@ -3,7 +3,7 @@
  * 
  * @brief The osmplib header 
  * 
- * @author Daniel Knüppe, Roderick Topütt 
+ * @author Daniel Knüppe, Roderick Topütt
  * 
  * @date April 2019
  */
@@ -32,6 +32,8 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
         return OSMP_ERROR;
     if((unsigned)dest >= base->num_proc)
         return OSMP_ERROR;
+    if(count * OSMP_sizeof(datatype) > OSMP_MAX_PAYLOAD_LENGTH)
+        return OSMP_ERROR;
     OSMP_msg_node* node = pop(&base->empty_list);
     node->datatype = datatype;
     node->len = count * OSMP_sizeof(datatype);
@@ -50,12 +52,20 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
     OSMP_msg_node *node = pop(&pcb_list[rank].inbox);
     *source = node->sender;
     *len = node->len;
-    memcpy(buf, node->msg_buf, count * OSMP_sizeof(datatype));
+
+    size_t size = node->len > count * OSMP_sizeof(datatype) ?
+                  node->len : count * OSMP_sizeof(datatype);
+    if(size > OSMP_MAX_PAYLOAD_LENGTH){
+        push(node, &base->empty_list);
+        return OSMP_ERROR;
+    }
+    memcpy(buf, node->msg_buf, size);
+    push(node, &base->empty_list);
+
     int ret;
     if(datatype != node->datatype)
         ret = node->datatype;
     else
         ret = OSMP_SUCCESS;
-    push(node, &base->empty_list);
     return ret;
 }
