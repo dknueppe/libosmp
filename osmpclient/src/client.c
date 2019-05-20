@@ -16,46 +16,59 @@
 int main(int argc, char *argv[])
 {
     int status;
+    int error = 0;
     int rank = -1;
     osmp_byte bar[] = "hello world!";
-    char recv[1024] = "";
+    char recv[OSMP_MAX_PAYLOAD_LENGTH] = "";
     OSMP_Datatype foobar = OSMP_typeof(bar[0]);
-    OSMP_Request myrequest;
+    OSMP_Request myrequest1, myrequest2;
     
     /* print out all arguments */
     printf("argv[] = ");
     for(int i = 0; i < argc; i++)
         printf("%s ",argv[i]);
-    printf("\n");
+    printf("\n");fflush(NULL);
 
     /* small nonexhaustive test of blocking functions */
     if((status = OSMP_Init(&argc, &argv) != OSMP_SUCCESS))
-        printf("Error\n");
+        printf("Error %d\n", error);fflush(NULL);error++;
     if((status = OSMP_Size(&rank) != OSMP_SUCCESS))
-        printf("Error 1\n");
+        printf("Error %d\n", error);fflush(NULL);error++;
     if((status = OSMP_Rank(&rank) != OSMP_SUCCESS))
-        printf("Error 2\n");
+        printf("Error %d\n", error);fflush(NULL);error++;
     if((status = OSMP_Send(bar, sizeof(bar), OSMP_typeof(bar[0]), rank) != OSMP_SUCCESS))
-        printf("Error 3\n");
+        printf("Error %d\n", error);fflush(NULL);error++;
     if((status = OSMP_Recv(recv, 13, foobar, &rank, &rank) != OSMP_SUCCESS))
-        printf("Error 4\n");
-    if((status = OSMP_Finalize() != OSMP_SUCCESS))
-        printf("Error 5\n");
+        printf("Error %d\n", error);fflush(NULL);error++;
     printf("message from blocking is:\t\"%s\"\n", recv);
 
     /* small nonexhaustive test of nonblocking functions */
     char irecv[OSMP_MAX_PAYLOAD_LENGTH] = "";
     int sender;
     int len;
-    if((status = OSMP_CreateRequest(&myrequest)) != OSMP_SUCCESS)
-        printf("Error 6\n");
-    if((status = OSMP_Isend(bar, sizeof(bar), OSMP_typeof(bar[0]), rank, myrequest)) != OSMP_SUCCESS)
-        printf("Error 7\n");
-    if((status = OSMP_Irecv(irecv, 13, OSMP_typeof(*bar), &sender, &len, myrequest)) != OSMP_SUCCESS)
-        printf("Error 8\n");
-    if((status = OSMP_RemoveRequest(&myrequest)) != OSMP_SUCCESS)
-        printf("Error 9\n");
-    printf("message from nonblocking is:\t\"%s\"\n", irecv);
+    if((status = OSMP_CreateRequest(&myrequest1)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+    if((status = OSMP_CreateRequest(&myrequest2)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
 
+    if((status = OSMP_Isend(bar, sizeof(bar), OSMP_typeof(bar[0]), rank, myrequest1)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+    if((status = OSMP_Irecv(irecv, 13, OSMP_typeof(*bar), &sender, &len, myrequest2)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+
+    if((status = OSMP_Wait(myrequest1)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+    if((status = OSMP_Wait(myrequest2)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+
+    if((status = OSMP_RemoveRequest(&myrequest1)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+    if((status = OSMP_RemoveRequest(&myrequest2)) != OSMP_SUCCESS)
+        printf("Error %d\n", error);fflush(NULL);error++;
+
+    printf("message from nonblocking is:\t\"%s\"\n", irecv);fflush(NULL);
+
+    if((status = OSMP_Finalize() != OSMP_SUCCESS))
+        printf("Error %d\n", error);fflush(NULL);error++;
     return 0;
 }
