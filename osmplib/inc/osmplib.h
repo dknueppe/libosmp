@@ -22,6 +22,7 @@
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
 
+/* use this to determine the message type */
 #define OSMP_typeof(X) _Generic(X, \
                             osmp_short:             OSMP_SHORT, \
                             osmp_int:               OSMP_INT, \
@@ -51,6 +52,10 @@ typedef enum {
     OSMP_UNDEFINED_UPPER,
 } OSMP_Datatype;
 
+/**
+ * @brief These are the datatypes which are supported for communication
+ * 
+ */
 typedef short           osmp_short;
 typedef int             osmp_int;
 typedef long            osmp_long;
@@ -62,6 +67,11 @@ typedef float           osmp_float;
 typedef double          osmp_double;
 typedef char            osmp_byte;
 
+/**
+ * @brief Information for async requests, filled and freed by respective 
+ *        OSMP_CreateRequest / OSMP_RemoveRequest
+ * 
+ */
 typedef struct OSMP_Request OSMP_Request;
 struct OSMP_Request {
     OSMP_Request *self;

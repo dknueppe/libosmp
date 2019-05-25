@@ -65,7 +65,9 @@ int main (int argc, char *argv[], char *envp[])
         }
     }
 
-    /* creating the name for the shm and the string for the env in execve later */
+    /* creating the name for the shared memory and the string for 
+     * the env list used in the later called execve
+     */
     char shm_name[18];
     get_shm_name18(shm_name);
     char *shm_name_env = malloc(28);

@@ -8,6 +8,8 @@
  * @date May 2019
  */
 
+extern OSMP_globals osmp_globals;
+
 typedef enum {
     async_trans_complete,
     async_trans_prepared,

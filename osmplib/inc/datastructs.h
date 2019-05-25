@@ -5,7 +5,7 @@ typedef struct {
     void *shm_base;
     int shm_fd;
     int rank;
-
+    int thread_error;
 } OSMP_globals;
 
 extern OSMP_globals osmp_globals;
@@ -48,14 +48,14 @@ typedef struct {
 } OSMP_pcb;
 
 typedef struct {
-    void **recv_buf;
-    const void **send_buf;
-    int *count;
-    OSMP_Datatype *datatype;
-    int *dest;
-    int **source;
-    int **len;
-    OSMP_Request *request;
+    void *recv_buf;
+    const void *send_buf;
+    int count;
+    OSMP_Datatype datatype;
+    int dest;
+    int *source;
+    int *len;
+    OSMP_Request request;
 } OSMP_async_arglist;
 
 size_t OSMP_sizeof(OSMP_Datatype dt);

@@ -20,7 +20,7 @@
 #include "queue.h"
 #include "osmplib.h"
 
-OSMP_globals osmp_globals = {.shm_base = NULL};
+OSMP_globals osmp_globals = {.shm_base = NULL, .thread_error = -1};
 
 /* pragmas are to shut the compiler up about unused argc and argv */
 #pragma GCC diagnostic ignored "-Wunused-parameter"
