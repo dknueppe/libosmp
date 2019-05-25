@@ -1,0 +1,13 @@
+R"(
+Usage: osmprun [options] number program
+Options:
+  -h, --help    Display this information
+  -V, --version Display version of this software
+  -n <number>   Specify how many processes are being launched
+  -p <program>  Specify which program to launch
+  -c, --child   Arguments after this flag are not parsed and instead
+                passed onto the launching child processes
+
+Issues can be reported at <https://git.fh-muenster.de/ospr/g05>
+
+)";

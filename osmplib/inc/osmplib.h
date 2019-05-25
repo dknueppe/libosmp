@@ -9,7 +9,7 @@
  */
 
 #pragma once
-
+#include <pthread.h>
 #include <semaphore.h>
 
 #define OSMP_SUCCESS     0
@@ -21,20 +21,25 @@
 #define OSMP_MAX_SLOTS 256
 /* max length of actual message */
 #define OSMP_MAX_PAYLOAD_LENGTH 1024
-/*
- * useful defines that turn up places 
- * also this is the actual memory layout 
- */
-#define base ((OSMP_base*)g_shm)
-#define pcb_list ((OSMP_pcb*)(((char*)g_shm)+sizeof(OSMP_base)))
 
-extern void *g_shm; 
-extern int g_shm_fd;
+/* use this to determine the message type */
+#define OSMP_typeof(X) _Generic(X, \
+                            osmp_short:             OSMP_SHORT, \
+                            osmp_int:               OSMP_INT, \
+                            osmp_long:              OSMP_LONG, \
+                            osmp_unsigned_char:     OSMP_UNSIGNED_CHAR, \
+                            osmp_unsigned_short:    OSMP_UNSIGNED_SHORT, \
+                            osmp_unsigned_int:      OSMP_UNSIGNED, \
+                            osmp_unsigned_long:     OSMP_UNSIGNED_LONG, \
+                            osmp_float:             OSMP_FLOAT, \
+                            osmp_double:            OSMP_DOUBLE, \
+                            osmp_byte:              OSMP_BYTE \
+                        )
 
-typedef void* OSMP_Request;
-
+/* provide type info by assigning integer vals to type */
 typedef enum {
-    OSMP_SHORT = 1,
+    OSMP_UNDEFINED,
+    OSMP_SHORT,
     OSMP_INT,
     OSMP_LONG,
     OSMP_UNSIGNED_CHAR,
@@ -44,36 +49,36 @@ typedef enum {
     OSMP_FLOAT,
     OSMP_DOUBLE,
     OSMP_BYTE,
+    OSMP_UNDEFINED_UPPER,
 } OSMP_Datatype;
 
-typedef struct {
-    int next;
-    int sender;
-    int receiver;
-    int len;
-    char msg_buf[OSMP_MAX_PAYLOAD_LENGTH];
-    OSMP_Datatype datatype;
-} OSMP_msg_node;
+/**
+ * @brief These are the datatypes which are supported for communication
+ * 
+ */
+typedef short           osmp_short;
+typedef int             osmp_int;
+typedef long            osmp_long;
+typedef unsigned char   osmp_unsigned_char;
+typedef unsigned short  osmp_unsigned_short;
+typedef unsigned int    osmp_unsigned_int;
+typedef unsigned long   osmp_unsigned_long;
+typedef float           osmp_float;
+typedef double          osmp_double;
+typedef char            osmp_byte;
 
-typedef struct {
-    int front;
-    int back;
-    sem_t max_length;
-    sem_t availabe;
-    sem_t queue_lock;
-} OSMP_queue;
-
-typedef struct {
-    size_t shm_size;
-    unsigned int num_proc;
-    OSMP_msg_node messages[OSMP_MAX_SLOTS];
-    OSMP_queue empty_list;
-} OSMP_base;
-
-typedef struct {
-    OSMP_queue inbox;
-    pid_t pid;
-} OSMP_pcb;
+/**
+ * @brief Information for async requests, filled and freed by respective 
+ *        OSMP_CreateRequest / OSMP_RemoveRequest
+ * 
+ */
+typedef struct OSMP_Request OSMP_Request;
+struct OSMP_Request {
+    OSMP_Request *self;
+    pthread_t thread;
+    int status;
+    void *args;
+};
 
 /**
  * @brief initializes the OSMP environment
@@ -138,7 +143,79 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest);
 int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len);
 
 /**
- * @brief calling processes are freeing used shared resources
+ * @brief Used to send messages to other child processes
+ * 
+ * The routine sends a Message to the process number specified
+ * by 'dest'. The message contains 'count' elements of type 
+ * 'datatype'. The message starts at 'buf'. The call is asynchrounos
+ * and thus returns imidiately. It can be waited for with OSMP_Wait().
+ * 
+ * @param buf Adresse of message
+ * @param count Length of message
+ * @param datatype Library message datatype
+ * @param dest Receiving child process
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Isend(const void *buf, int count ,OSMP_Datatype datatype, int dest,
+               OSMP_Request request);
+
+/**
+ * @brief Used to retrieve received messages from other processes
+ * 
+ * The calling Process receives a message of a maximum of 'count' elements
+ * of type 'datatype'. The message is written at 'buf' of the calling process.
+ * 'source' contains the number of the child processe which has send the message.
+ * 'len' contains the actual length of the message. The call is asynchrounus thus
+ * and thus returns imidiately. It can be waited for with OSMP_Wait()
+ * 
+ * @param buf Adress of message in local memory
+ * @param count number of elements
+ * @param datatype Library message datatype
+ * @param source number of Sender
+ * @param len Actual length of message
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len,
+               OSMP_Request request);
+
+/**
+ * @brief Used to test the state of the operation linked to request. The routine
+ * does not block and returns imidately.
+ * 
+ * @param request Information about the transfer
+ * @param flag Set to 1 if request is finished 0 otherwise
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Test(OSMP_Request request, int *flag);
+
+/**
+ * @brief Used to wait for the Operation, linked to request, to finish.
+ * 
+ * @param request Information about the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_Wait(OSMP_Request request);
+
+/**
+ * @brief preparation for asynchrounus communication
+ * 
+ * @param request The information required for the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_CreateRequest(OSMP_Request *request);
+
+/**
+ * @brief cleanup of request and related information
+ * 
+ * @param request The request used for the transfer
+ * @return int Returns 0 on success, ERROR code otherwise
+ */
+int OSMP_RemoveRequest(OSMP_Request *request);
+
+/**
+ * @brief Calling processes are freeing used shared resources
  * 
  * @return int Returns 0 on success, ERROR code otherwise
  */
