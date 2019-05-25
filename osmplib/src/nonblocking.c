@@ -20,6 +20,8 @@ int OSMP_CreateRequest(OSMP_Request *request)
     request->self = request;
     request->status = async_trans_prepared;
     request->args = malloc(sizeof(OSMP_async_arglist));
+    if(request->args == NULL)
+        return OSMP_ERROR;
     return OSMP_SUCCESS;
 }
 
