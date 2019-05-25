@@ -100,7 +100,7 @@ void *recv_wrapper(void *arglist)
                  args->datatype,
                  args->source,
                  args->len))
-        pthread_exit(NULL);
+        pthread_exit(&(osmp_globals.thread_error));
     ((args->request).self)->status = async_trans_complete;
 
     pthread_exit(&(((args->request).self)->status));
