@@ -22,7 +22,7 @@
 
 OSMP_globals osmp_globals = {.shm_base = NULL, .thread_error = -1};
 
-/* pragmas are to shut the compiler up about unused argc and argv */
+/* pragmas to shut the compiler up about unused argc and argv */
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 int OSMP_Init(int *argc, char ***argv)
 {

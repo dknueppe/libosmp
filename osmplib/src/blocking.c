@@ -39,9 +39,6 @@ int OSMP_Send(const void *buf, int count, OSMP_Datatype datatype, int dest)
     node->len = count * OSMP_sizeof(datatype);
     node->receiver = dest;
     node->sender = rank;
-#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-    printf("SEND: copying from 0x%08X to 0x%08X\n", (unsigned int)buf, (unsigned int)node->msg_buf); fflush(NULL);
-#pragma GCC diagnostic pop
     memcpy(node->msg_buf, buf, count);
     push(node, &pcb_list[dest].inbox);
     return OSMP_SUCCESS;
@@ -62,9 +59,6 @@ int OSMP_Recv(void *buf, int count, OSMP_Datatype datatype, int *source, int *le
         push(node, &base->empty_list);
         return OSMP_ERROR;
     }
-#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-    printf("RECV: copying from 0x%08X to 0x%08X\n", (unsigned int)node->msg_buf, (unsigned int)buf); fflush(NULL);
-#pragma GCC diagnostic pop
     memcpy(buf, node->msg_buf, size);
     push(node, &base->empty_list);
 
