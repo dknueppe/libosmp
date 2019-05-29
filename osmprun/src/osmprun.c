@@ -200,5 +200,5 @@ void get_shm_name18(char c[])
 	    c[i] = rand() % 10 + '0';
     }
     c[17] = '\0';
-    printf("shared memory name will be: %s\n",c);
+    //printf("shared memory name will be: %s\n",c);
 }
