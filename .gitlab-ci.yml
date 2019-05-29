@@ -5,12 +5,13 @@ stages:
 build:
     stage: build
     script:
-        - echo "Building"
         - make
+    artifacts:
+        paths:
+            - build
 
 test:
     stage: test
     script:
-        - echo "Testing"
         - make test
         
