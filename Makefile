@@ -51,7 +51,7 @@ $(foreach T, $(TARGETS), $(eval $(call TARGET_template, $(BUILD_DIR)/$T, \
 		$(BUILD_DIR)/$(basename $(notdir $(wildcard $T/src/*.c))).o)))
 ###############################################################################
 
-test : all
+test :
 	$(RUN_TESTSUITE)
 
 clean :
