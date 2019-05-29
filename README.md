@@ -1,10 +1,14 @@
+[![build status](https://git.fh-muenster.de/ospr/g05/badges/master/pipeline.svg)
+](https://git.fh-muenster.de/ospr/g05/commits/master/pipeline.svg)
+
+
 # Betriebssysteme Praktikum der Gruppe G05
 ## Daniel Knüppe, Roderick Topütt
 
 ### Ordnerübersicht 
 
 * **osmpclient** enthält eine Beispielimplementation für die Nutzung der Bibliothek
-* **osmplib** enthält die Bibliothek selbs
+* **osmplib** enthält die Bibliothek selbst
 * **osmprun** enthält den Prozessmanager
 * **testsuite** enthält Programme zum testen der Bibliotheksfunktionen
 
