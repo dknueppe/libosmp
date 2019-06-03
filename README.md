@@ -1,6 +1,7 @@
 [![build status](https://git.fh-muenster.de/ospr/g05/badges/master/pipeline.svg)
 ](https://git.fh-muenster.de/ospr/g05/pipelines)
-
+[![build status](https://git.fh-muenster.de/ospr/g05/badges/master/coverage.svg)
+](https://git.fh-muenster.de/ospr/g05/-/jobs)
 
 # Betriebssysteme Praktikum der Gruppe G05
 ## Daniel Knüppe, Roderick Topütt
