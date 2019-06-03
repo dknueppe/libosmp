@@ -15,3 +15,7 @@ test:
     script:
         - make test
         
+mem_test:
+    stage: test
+    script:
+        - valgrind ./build/osmprun
