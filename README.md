@@ -1,5 +1,5 @@
 [![build status](https://git.fh-muenster.de/ospr/g05/badges/master/pipeline.svg)
-](https://git.fh-muenster.de/ospr/g05/commits/master/pipeline.svg)
+](https://git.fh-muenster.de/ospr/g05/pipelines)
 
 
 # Betriebssysteme Praktikum der Gruppe G05
