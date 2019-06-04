@@ -1,4 +1,4 @@
-image: "git.fh-muenster.de:4567/ospr/g05:latest"
+image: "ospr/g05:latest"
 
 stages:
     - build
