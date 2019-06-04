@@ -119,7 +119,7 @@ int main()
     }
 
     printf("\n");
-    if (Test_Falsche_groesse_emfangen()) // ruft die rutine für das emfangen von nachrichten falscher grösse
+    if (Test_Falsche_groesse_empfangen()) // ruft die rutine für das emfangen von nachrichten falscher grösse
     {
         Fehler++;
         printf("Test nicht wie erwartet abgelaufen!\n");
@@ -167,6 +167,10 @@ int Test_ohne_ini()
     char recv[OSMP_MAX_PAYLOAD_LENGTH] = "";
     OSMP_Datatype foobar = OSMP_typeof(bar[0]);
     OSMP_Request myrequest1, myrequest2;
+
+    // hab hier mal rumgepfuscht!
+    void *irecv;
+    
 
     if ((status = OSMP_Size(&size) == OSMP_SUCCESS))
     {
@@ -257,7 +261,7 @@ int Test_Nachrichten_austehend()
 int Test_Init_Final_Init()
 {
     printf("Test 6\n");
-    return 0
+    return 0;
 }
 
 //- leere Nachricht
@@ -275,7 +279,7 @@ int Test_Falsche_groesse_senden()
 }
 
 //- Nachricht mit Falscher größe emfangen
-int Test_Falsche_groesse_emfangen()
+int Test_Falsche_groesse_empfangen()
 {
     printf("Test 9\n");
     return 0;
