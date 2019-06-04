@@ -20,4 +20,4 @@ test:
 mem_test:
     stage: test
     script:
-        - valgrind ./build/osmprun
+        - valgrind --error-exitcode=2 ./build/osmprun
