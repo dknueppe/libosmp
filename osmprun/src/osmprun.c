@@ -24,6 +24,8 @@
 #include "osmprun.h"
 #include "queue.h"
 
+#define VERSION "0.5.1"
+
 #define NUM_PROC 1
 #define PROG "build/osmpclient"
 
@@ -170,17 +172,17 @@ int main (int argc, char *argv[], char *envp[])
 
 void print_help()
 {
-    char help[] = 
+    char help_txt[] = 
 #include "help.txt"
-    printf("%s", help);
+    printf(help_txt);
     exit(0);
 }
 
 void print_version()
 {
-    char version[] =
+    char version_txt[] =
 #include "version.txt"
-    printf("%s", version);
+    printf(version_txt, VERSION);
     exit(0);
 }
 
