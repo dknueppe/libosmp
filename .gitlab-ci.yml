@@ -1,4 +1,5 @@
-image: "git.fh-muenster.de:4567/ospr/g05:latest"
+include:
+  template: SAST.gitlab-ci.yml
 
 stages:
     - build
@@ -12,12 +13,13 @@ build:
         paths:
             - build
 
-test:
+testsuite:
     stage: test
     script:
         - make test
         
 mem_test:
+    image: "git.fh-muenster.de:4567/ospr/g05:latest"
     stage: test
     script:
         - valgrind --error-exitcode=2 ./build/osmprun
