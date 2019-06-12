@@ -19,7 +19,7 @@ testsuite:
         - make test
         
 mem_test:
-    image: "git.fh-muenster.de:4567/ospr/g05:latest"
+    image: "git.fh-muenster.de:4567/dk426722/libosmp:latest"
     stage: test
     script:
         - valgrind --error-exitcode=2 ./build/osmprun
