@@ -12,7 +12,7 @@ extern OSMP_globals osmp_globals;
 
 /*
  * useful defines that turn up places 
- * also this represents the actual memory layout 
+ * also this represents the actual shared memory layout 
  */
 #define base ((OSMP_base*)osmp_globals.shm_base)
 #define pcb_list ((OSMP_pcb*)(((char*)osmp_globals.shm_base)+sizeof(OSMP_base)))
@@ -57,5 +57,11 @@ typedef struct {
     int *len;
     OSMP_Request request;
 } OSMP_async_arglist;
+
+typedef struct OSMP_req {
+    pthread_t thread;
+    int status;
+    OSMP_async_arglist args;
+} OSMP_req;
 
 size_t OSMP_sizeof(OSMP_Datatype dt);

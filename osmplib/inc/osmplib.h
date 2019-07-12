@@ -72,13 +72,7 @@ typedef char            osmp_byte;
  *        OSMP_CreateRequest / OSMP_RemoveRequest
  * 
  */
-typedef struct OSMP_Request OSMP_Request;
-struct OSMP_Request {
-    OSMP_Request *self;
-    pthread_t thread;
-    int status;
-    void *args;
-};
+typedef void* OSMP_Request;
 
 /**
  * @brief initializes the OSMP environment

@@ -2,7 +2,7 @@
 # part of the operatingsystems module @FH-Münster
 # Author: Daniel Knüppe (@DanielKnueppe)
 
-TARGETS = osmpclient osmprun testsuite
+TARGETS = osmpclient osmprun
 LIBRARY = osmp
 LIB_DIR = osmplib
 BUILD_DIR = build
@@ -19,8 +19,6 @@ CC = gcc
 CC_FLAGS = -ggdb3 -O3 -Wall -Wextra -pthread -Wpedantic -std=gnu11 $(WERROR)
 LD_FLAGS = -lpthread -lrt
 DEFINES =
-
-RUN_TESTSUITE =$(BUILD_DIR)/testsuite
 
 all : $(BUILD_DIR) $(BUILD_DIR)/lib$(LIBRARY).a $(OBJS) $(foreach T, $(TARGETS), $(BUILD_DIR)/$T)
 
@@ -50,9 +48,6 @@ endef
 $(foreach T, $(TARGETS), $(eval $(call TARGET_template, $(BUILD_DIR)/$T, \
 		$(BUILD_DIR)/$(basename $(notdir $(wildcard $T/src/*.c))).o)))
 ###############################################################################
-
-test :
-	$(RUN_TESTSUITE)
 
 clean :
 	rm -rf $(BUILD_DIR)
