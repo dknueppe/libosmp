@@ -1,10 +1,9 @@
 [![build status](https://git.fh-muenster.de/ospr/g05/badges/master/pipeline.svg)
-](https://git.fh-muenster.de/ospr/g05/pipelines)
-[![test coverage](https://git.fh-muenster.de/ospr/g05/badges/master/coverage.svg?test=coverage)
-](https://git.fh-muenster.de/ospr/g05/-/jobs)
+](https://git.fh-muenster.de/dk426722/libosmp/pipelines)
+[![test coverage](https://img.shields.io/badge/test-coverage-f39f37.svg)
+](https://img.shields.io/badge/test-coverage-f39f37.svg)
 
-# Betriebssysteme Praktikum der Gruppe G05
-## Daniel Knüppe, Roderick Topütt
+# Betriebssysteme Praktikum von Daniel Knüppe
 
 ### Ordnerübersicht 
 
