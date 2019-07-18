@@ -1,5 +1,5 @@
 include:
-  - remote: '/testsuite/.gitlab-ci.yml'
+  - file: '/testsuite/.gitlab-ci.yml'
   - template: SAST.gitlab-ci.yml
 
 #stages:
