@@ -1,6 +1,6 @@
 include:
-  file: '/testsuite/.gitlab-ci.yml'
-  template: SAST.gitlab-ci.yml
+  - '/testsuite/.gitlab-ci.yml'
+  - template: SAST.gitlab-ci.yml
 
 #stages:
 #    - build
