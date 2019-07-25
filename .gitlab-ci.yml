@@ -17,6 +17,7 @@ build:
             - build
 
 testsuite:
+    image: "git.fh-muenster.de:4567/dk426722/libosmp:latest"
     stage: test
     script:
         - python3 testsuite/testit.py
