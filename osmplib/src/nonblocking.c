@@ -17,6 +17,8 @@
 
 int OSMP_CreateRequest(OSMP_Request *request)
 {
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     request = malloc(sizeof(OSMP_req));
     if(request == NULL)
         return OSMP_ERROR;
@@ -27,11 +29,15 @@ int OSMP_CreateRequest(OSMP_Request *request)
 int OSMP_RemoveRequest(OSMP_Request *request) 
 {
     free(request);
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     return OSMP_SUCCESS; 
 }
 
 int OSMP_Wait(OSMP_Request request)
 {
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     if(pthread_join(((OSMP_req *)request)->thread, NULL))
         return OSMP_ERROR;
     return OSMP_SUCCESS;
@@ -39,6 +45,8 @@ int OSMP_Wait(OSMP_Request request)
 
 int OSMP_Test(OSMP_Request request, int *flag)
 {
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     *flag = ((OSMP_req *)request)->status;
     return OSMP_SUCCESS;
 }
@@ -46,6 +54,8 @@ int OSMP_Test(OSMP_Request request, int *flag)
 int OSMP_Isend(const void *buf, int count, OSMP_Datatype datatype, int dest,
                OSMP_Request request)
 {
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     ((OSMP_req *)request)->args.send_buf = buf;
     ((OSMP_req *)request)->args.count    = count;
     ((OSMP_req *)request)->args.datatype = datatype;
@@ -63,6 +73,8 @@ int OSMP_Isend(const void *buf, int count, OSMP_Datatype datatype, int dest,
 int OSMP_Irecv(void *buf, int count, OSMP_Datatype datatype, int *source, int *len,
                OSMP_Request request)
 {
+    if(osmp_globals.shm_base == NULL)
+        return OSMP_ERROR;
     ((OSMP_req *)request)->args.recv_buf = buf;
     ((OSMP_req *)request)->args.count    = count;
     ((OSMP_req *)request)->args.datatype = datatype;

@@ -1,5 +1,5 @@
 # Makefile for building the OSMP library and complementary binaries
-# part of the operatingsystems module @FH-Münster
+# part of the operatingsystems module at the UAS Münster
 # Author: Daniel Knüppe (@DanielKnueppe)
 
 TARGETS = osmpclient osmprun
@@ -52,4 +52,6 @@ $(foreach T, $(TARGETS), $(eval $(call TARGET_template, $(BUILD_DIR)/$T, \
 clean :
 	rm -rf $(BUILD_DIR)
 
-.PHONY : all clean test
+.PHONY : all clean
+
+include testsuite/test.mk
