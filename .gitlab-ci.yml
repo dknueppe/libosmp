@@ -1,6 +1,9 @@
 include:
   template: SAST.gitlab-ci.yml
-
+  
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  
 stages:
     - build
     - test
