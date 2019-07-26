@@ -20,7 +20,7 @@ CC_FLAGS = -ggdb3 -O3 -Wall -Wextra -pthread -Wpedantic -std=gnu11 $(WERROR)
 LD_FLAGS = -lpthread -lrt
 DEFINES =
 
-all : $(BUILD_DIR) $(BUILD_DIR)/lib$(LIBRARY).a $(OBJS) $(foreach T, $(TARGETS), $(BUILD_DIR)/$T)
+all : $(BUILD_DIR) $(BUILD_DIR)/lib$(LIBRARY).a $(OBJS) $(foreach T, $(TARGETS), $(BUILD_DIR)/$T) test
 
 $(BUILD_DIR) :
 	mkdir $@

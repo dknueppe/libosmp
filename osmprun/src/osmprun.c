@@ -108,14 +108,14 @@ int main (int argc, char *argv[], char *envp[])
             exit(1);
     }
 
-    /* prepare child_argv from argv for the child execve */
+    /* prepare child_argv from argv for use in the child execve */
     int size =  argc - index_child_argv;
     char **child_argv = malloc((size + 1) * sizeof(*child_argv));
     for(int i = 0; i < size; i++)
         child_argv[i] = argv[i + index_child_argv];
     child_argv[size] = NULL;
     child_argv[0] = program;
-    /* prepare child_envp from envp for the child execve */
+    /* prepare child_envp from envp for use in the child execve */
     size = 0;
     while(envp[size] != NULL)
         size++;
@@ -127,10 +127,9 @@ int main (int argc, char *argv[], char *envp[])
 
     /* launch num_proc child processes */
     int ret_exec;
-    pid_t tmp;
     argv[0] = shm_name;
     for(int i = 0; i < num_proc; i++) {
-        tmp = fork();
+        pid_t tmp = fork();
         if(tmp == -1) {
             exit(1);
         } else if (tmp == 0) {
@@ -145,7 +144,7 @@ int main (int argc, char *argv[], char *envp[])
     for(int i = 0; i < num_proc; i++) {
         int status;
         pid_t tmp = wait(&status);
-        printf("child with pid [%d] exited\n", tmp);
+        /*printf("child with pid [%d] exited\n", tmp);*/
     }
 
     /* de initialize the queues */
@@ -153,7 +152,7 @@ int main (int argc, char *argv[], char *envp[])
     for(int i = 0; i < num_proc; i++)
         destroy_queue(&pcb_list[i].inbox);
 
-    /* free up the shared memory */
+    /* release the shared memory related resources */
     if(munmap(osmp_globals.shm_base, shm_size) == -1) {
         printf("Error calling munmap:\n%s",strerror(errno));
         exit(1);

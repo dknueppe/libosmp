@@ -11,7 +11,7 @@ stages:
 build:
     stage: build
     script:
-        - make test -j$(nproc --all)
+        - make -j$(nproc --all)
     artifacts:
         paths:
             - build
