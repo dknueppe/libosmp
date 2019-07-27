@@ -1,0 +1,3 @@
+[submodule "testsuite"]
+	path = testsuite
+	url = ssh://git@git.fh-muenster.de:2323/dk426722/libosmp-testsuite.git
