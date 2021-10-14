@@ -1,8 +1,3 @@
-[![build status](https://git.fh-muenster.de/ospr/g05/badges/master/pipeline.svg)
-](https://git.fh-muenster.de/dk426722/libosmp/pipelines)
-[![test coverage](https://img.shields.io/badge/test-coverage-f39f37.svg)
-](https://img.shields.io/badge/test-coverage-f39f37.svg)
-
 # Betriebssysteme Praktikum von Daniel Knüppe
 
 ### Ordnerübersicht 

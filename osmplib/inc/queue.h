@@ -3,7 +3,7 @@
  * 
  * @brief The source for the program which gets multithreaded
  * 
- * @author Daniel Knüppe, Roderick Topütt 
+ * @author Daniel Knüppe
  * 
  * @date April 2019
  */

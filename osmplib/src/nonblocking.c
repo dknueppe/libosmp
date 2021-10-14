@@ -3,7 +3,7 @@
  * 
  * @brief Implementations of non-blocking transfer routines
  * 
- * @author Daniel Knüppe, Roderick Topütt 
+ * @author Daniel Knüppe
  * 
  * @date May 2019
  */

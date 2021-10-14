@@ -3,7 +3,7 @@
  * 
  * @brief Header for helper functions and such...
  * 
- * @author Daniel Knüppe, Roderick Topütt 
+ * @author Daniel Knüppe
  * 
  * @date May 2019
  */
